@@ -87,4 +87,5 @@ dependencies {
     implementation "com.afollestad.material-dialogs:bottomsheets:3.3.0"
     //BaseAdapter
     implementation "io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.1.2"
+    implementation 'me.jessyan:autosize:1.2.1'
 }

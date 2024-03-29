@@ -19,8 +19,8 @@ class LoginActivity : BaseActivity<LoginRegisterViewModel, ActivityLoginBinding>
 
     inner class ProxyClick {
 
-        fun clear() {
-            mViewModel.username.set("")
+        fun gofinish() {
+            finish()
         }
 
         fun login() {
@@ -32,7 +32,11 @@ class LoginActivity : BaseActivity<LoginRegisterViewModel, ActivityLoginBinding>
             }
         }
 
-        fun goRegister() {
+        fun getotp() {
+            mViewModel.post(
+                mViewModel.username.get(),
+                mViewModel.password.get()
+            )
         }
 
     }

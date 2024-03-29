@@ -8,7 +8,7 @@ import retrofit2.http.*
 interface ApiService {
 
     companion object {
-        const val SERVER_URL = "http://149.129.217.31:1360/"
+        const val SERVER_URL = "http://149.129.217.31:1360/TTaEPu/rgvIw/"
 
     }
 
@@ -21,8 +21,8 @@ interface ApiService {
     ): ApiResponse<UserInfo>
 
 
-    @Multipart
+    @FormUrlEncoded
     @POST(SERVER_URL)
-    suspend fun post2(@Part("noncestr") name: RequestBody, @Part("userPhone") name2: RequestBody, @Part("reqSign") name3: RequestBody,
+    suspend fun post2(@Part("reMMMqMSign") name: RequestBody, @Part("noBBBnBcestr") name2: RequestBody, @Part("usNNNeNrPhone") name3: RequestBody,
     ): ApiResponse<UserInfo>
 }

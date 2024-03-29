@@ -7,17 +7,15 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
 import androidx.viewpager2.widget.ViewPager2
 import com.bjxapp.online.base.activity.BaseActivity1
 import com.bjxapp.online.base.viewmodel.BaseViewModel
 import com.lemon.now.online.R
 import com.lemon.now.online.databinding.ActivitySplashBinding
 
-class SplashActivity : BaseActivity1<BaseViewModel, ActivitySplashBinding>() {
+class SplashActivity : BaseActivity1<BaseViewModel, ActivitySplashBinding>(), ImageSliderAdapter.OnLastItemBoundListener {
 
     private lateinit var viewPager: ViewPager2
-    private lateinit var nextButton: Button
 
     override fun initView(savedInstanceState: Bundle?) {
         val lp = this.window.attributes
@@ -31,22 +29,21 @@ class SplashActivity : BaseActivity1<BaseViewModel, ActivitySplashBinding>() {
         var isFirst:   Boolean by SPUtil("isFirst", false)
         isFirst=true
         viewPager = findViewById(R.id.viewPager)
-        nextButton = findViewById(R.id.nextButton)
 
-        val images = listOf(R.drawable.ic_launcher_background, R.drawable.ic_launcher_background, R.drawable.ic_launcher_background)
-        val adapter = ImageSliderAdapter(images)
+        val images = listOf(R.mipmap.splogo1, R.mipmap.splogo2, R.mipmap.splogo3)
+        val postion = listOf(R.mipmap.postion1, R.mipmap.postion2, R.mipmap.postion3)
+        val title = listOf(R.string.title1, R.string.title2, R.string.title3)
+        val adapter = ImageSliderAdapter(images,postion,title,this)
         viewPager.adapter = adapter
 
-        nextButton.setOnClickListener {
-            val currentItem = viewPager.currentItem
-            if (currentItem==2){
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }else{
-                viewPager.setCurrentItem((currentItem + 1) , true)
-            }
-
+    }
+    override fun onLastItemBound() {
+        val currentItem = viewPager.currentItem
+        if (currentItem==2){
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }else{
+            viewPager.setCurrentItem((currentItem + 1) , true)
         }
     }
-
 }

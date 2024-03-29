@@ -2,7 +2,6 @@ package com.bjxapp.online.base.etx.net
 
 import android.os.Build
 import com.bjxapp.online.ui.bean.DeviceInfo
-import com.google.gson.Gson
 import com.lemon.now.online.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -21,7 +20,7 @@ class MyHeadInterceptor : Interceptor {
         builder.addHeader("token", "").build()
         var deviceInfo = DeviceInfo(UUID.randomUUID().toString(), BuildConfig.VERSION_CODE.toString(), BuildConfig.APPLICATION_ID,Build.BRAND,
             "other",Build.MODEL,"","","Android",Build.VERSION.RELEASE + "")
-        builder.addHeader("deviceInfo", Gson().toJson(deviceInfo)).build()
+        builder.addHeader("deviceInfo", "{  \"androidIdOrUdid\": \"AD0A79D4-E302-4A33-8E45-DF754DD80204\",  \"appVersion\": \"1.0.0\",  \"bag\": \"com.india.very.look.name.app\",  \"brand\": \"Xiaomi\",  \"channel\": \"\",  \"deviceModel\": \"Simulator\",  \"gaidOrIdfa\": \"\",  \"operationSys\": \"android\",  \"osVersion\": \"17.0\"}").build()
         return chain.proceed(builder.build())
     }
 }

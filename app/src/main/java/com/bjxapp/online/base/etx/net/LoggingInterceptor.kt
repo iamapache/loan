@@ -1,12 +1,13 @@
 package com.bjxapp.online.base.etx.net
 
+import com.bjxapp.online.base.etx.util.logv
 import com.bjxapp.online.util.MD5Util
+import okhttp3.FormBody
 import okhttp3.Interceptor
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.Response
-import okio.Buffer
 import java.io.IOException
+import java.util.UUID
 
 
 /**
@@ -17,30 +18,53 @@ import java.io.IOException
 class LoggingInterceptor : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request: Request = chain.request()
-
-        // 只打印非PATCH请求，因为PATCH请求的RequestBody可能会被重复使用
-        if (request.method.equals("PATCH")) {
-            return chain.proceed(request)
-        }
-        val requestBody: RequestBody? = request.body
-        if (requestBody != null) {
-            val buffer = Buffer()
-            requestBody.writeTo(buffer)
-
-            // 确保请求体内容不会被消耗掉
-            val bodyString: String = buffer.readUtf8()
-            // 打印请求体参数
-            println("Request Body: $bodyString${MD5Util.getMD5("noncestr=qwqw&userPhone=123&signKey=iYeXsbQTefsNWaAyFSDRBnkb").toUpperCase()}")
-
-            // 重新构建请求，使用新的请求体
-            val newRequest: Request = request.newBuilder()
-                .method(request.method, RequestBody.create(requestBody.contentType(), bodyString))
-                .build()
-
-            // 继续请求流程
+        val originalRequest = chain.request()
+        val originalRequestBody = originalRequest.body
+        if (originalRequestBody is FormBody) {
+            val newRequest = modifyFormData(originalRequest)
             return chain.proceed(newRequest)
         }
-        return chain.proceed(request)
+        return chain.proceed(originalRequest)
+    }
+
+    private fun modifyFormData(originalRequest: Request): Request {
+        val originalFormBody = originalRequest.body as FormBody
+        val parameterNames = mutableListOf<String>()
+        val parameterValues = mutableMapOf<String, String>()
+        for (i in 0 until originalFormBody.size) {
+            val name = originalFormBody.name(i)
+            val value = originalFormBody.value(i)
+            parameterNames.add(name)
+            parameterValues[name] = value
+        }
+        parameterNames.add("noBBBnBcestr")
+        parameterValues["noBBBnBcestr"] = UUID.randomUUID().toString()
+        // 按照参数名的 ASCII 码从小到大排序
+        parameterNames.sort()
+        val concatenatedParams = StringBuilder()
+        for (name in parameterNames) {
+            val value = parameterValues[name]
+            if (value != null) {
+                concatenatedParams.append("&").append(name).append("=").append(value)
+
+            }
+        }
+        concatenatedParams.append("&").append("cashwallet").append("=").append("MSXZ8FNV0VMXA1CNV")
+        // 删除开头的 "&"
+        if (concatenatedParams.isNotEmpty()) {
+            concatenatedParams.deleteCharAt(0)
+        }
+        concatenatedParams.toString().logv()
+        val md5Hash = MD5Util.getMD5(concatenatedParams.toString()).toUpperCase()
+        val newRequestBodyBuilder = FormBody.Builder()
+        for (name in parameterNames) {
+            val value = parameterValues[name]
+            if (value != null) {
+                newRequestBodyBuilder.add(name, value)
+            }
+        }
+        newRequestBodyBuilder.add("reMMMqMSign", md5Hash)
+        val newFormBody = newRequestBodyBuilder.build()
+        return originalRequest.newBuilder().post(newFormBody).build()
     }
 }

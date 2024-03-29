@@ -1,31 +1,21 @@
 package com.bjxapp.online.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
-import com.bjxapp.online.base.activity.BaseActivity1
-import com.bjxapp.online.base.viewmodel.BaseViewModel
-import com.bjxapp.online.ui.adapter.MainAdapter
-import com.lemon.now.online.R
+import com.bjxapp.online.base.activity.BaseActivity
+import com.bjxapp.online.base.etx.util.setTitleCenter
+import com.bjxapp.online.ui.model.HomeViewModel
 import com.lemon.now.online.databinding.ActivityMainBinding
 
 
-class MainActivity : BaseActivity1<BaseViewModel, ActivityMainBinding>() {
+class MainActivity : BaseActivity<HomeViewModel, ActivityMainBinding>() {
 
     override fun initView(savedInstanceState: Bundle?) {
-        mViewBind.mainViewPager.adapter = MainAdapter(this)
-        mViewBind.mainViewPager.offscreenPageLimit = mViewBind.mainViewPager.adapter!!.itemCount
-        mViewBind.mainNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigationHome -> {
-                    //切换到首页
-                    mViewBind.mainViewPager.setCurrentItem(0, false)
-                }
-                R.id.navigationUser -> {
-                    //切换到个人中心
-                    mViewBind.mainViewPager.setCurrentItem(3, false)
-                }
-            }
-            true
-        }
+        mDatabind.viewmodel = mViewModel
+        mDatabind.toolbar.setTitleCenter("Home")
+        mDatabind.llOrder.setOnClickListener { startActivity(Intent(this@MainActivity, LoginActivity::class.java)) }
+
+        mViewModel.post()
     }
 
 }
