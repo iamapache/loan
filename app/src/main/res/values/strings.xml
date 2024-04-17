@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name">Lemon Cash</string>
-
-    <string name="bottom_title_home">主页</string>
-    <string name="bottom_title_user">个人中心</string>
+    <string name="toastinformation">Please provide the needed information</string>
 
     <string name="title1">Easy Online Processes</string>
     <string name="title2">Expert Loan Services</string>
     <string name="title3">Smooth and Quick Loans</string>
+    <string name="autext1"><![CDATA[Clear & original documents]]></string>
 </resources>

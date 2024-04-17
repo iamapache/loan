@@ -7,11 +7,11 @@
 
         <variable
             name="viewmodel"
-            type="com.bjxapp.online.ui.model.LoginRegisterViewModel" />
+            type="com.lemon.now.ui.model.LoginModel" />
 
         <variable
             name="click"
-            type="com.bjxapp.online.ui.activity.LoginActivity.ProxyClick" />
+            type="com.lemon.now.ui.activity.LoginActivity.ProxyClick" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,8 +45,8 @@
             android:layout_height="15dp"
             android:layout_marginLeft="17dp"
             android:layout_marginTop="17dp"
-            android:background="@mipmap/ic_back"
-            bind:noRepeatClick="@{()-> click.gofinish()}"
+            android:background="@mipmap/icon_back"
+            android:onClick="@{()->click.gofinish()}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -109,9 +109,10 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:hint="Mobile number"
-                    android:inputType="text"
+                    android:inputType="numberDecimal"
+                    android:text="@={viewmodel.username}"
                     android:lines="1"
-                    android:maxLength="20"
+                    android:maxLength="10"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     android:textColor="@color/black"
@@ -168,9 +169,10 @@
                         android:background="@null"
                         android:gravity="center"
                         android:hint=""
-                        android:inputType="textMultiLine"
+                        android:inputType="numberDecimal"
+                        android:text="@={viewmodel.editText}"
+                        android:maxLength="1"
                         android:paddingBottom="8dp"
-                        android:text="8"
                         android:textColor="#333333"
                         android:textSize="20sp" />
 
@@ -196,9 +198,10 @@
                         android:background="@null"
                         android:gravity="center"
                         android:hint=""
-                        android:inputType="textMultiLine"
+                        android:inputType="numberDecimal"
+                        android:text="@={viewmodel.editText2}"
+                        android:maxLength="1"
                         android:paddingBottom="8dp"
-                        android:text="8"
                         android:textColor="#333333"
                         android:textSize="20sp" />
 
@@ -224,9 +227,10 @@
                         android:background="@null"
                         android:gravity="center"
                         android:hint=""
-                        android:inputType="textMultiLine"
+                        android:inputType="numberDecimal"
+                        android:text="@={viewmodel.editText3}"
+                        android:maxLength="1"
                         android:paddingBottom="8dp"
-                        android:text="8"
                         android:textColor="#333333"
                         android:textSize="20sp" />
 
@@ -252,9 +256,10 @@
                         android:background="@null"
                         android:gravity="center"
                         android:hint=""
-                        android:inputType="textMultiLine"
+                        android:inputType="numberDecimal"
+                        android:text="@={viewmodel.editText4}"
+                        android:maxLength="1"
                         android:paddingBottom="8dp"
-                        android:text="8"
                         android:textColor="#333333"
                         android:textSize="20sp" />
 
@@ -276,6 +281,7 @@
             android:layout_height="50dp"
             android:background="@drawable/button_shap"
             android:gravity="center"
+            android:onClick="@{()-> click.login()}"
             app:layout_constraintBottom_toBottomOf="@+id/ll_login"
             app:layout_constraintLeft_toLeftOf="@+id/ll_login"
             app:layout_constraintRight_toRightOf="@+id/ll_login"
@@ -311,13 +317,14 @@
 
             <CheckBox
                 android:id="@+id/agreeCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:button="@null"
                 android:background="@drawable/custom_checkbox_background"
                 android:checked="false" />
 
             <TextView
+                android:id="@+id/agree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="14dp"
