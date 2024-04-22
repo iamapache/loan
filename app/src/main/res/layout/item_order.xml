@@ -84,8 +84,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:gravity="center_vertical"
                 android:layout_height="wrap_content">
                 <TextView
@@ -108,11 +107,6 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/orderfb"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@mipmap/orderfb" />
         </LinearLayout>
 
         <LinearLayout

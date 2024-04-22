@@ -3,6 +3,8 @@ package com.lemon.now.ui.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -48,7 +50,7 @@ class OrderTobeActivity : BaseActivity1<OrderViewModel, ActivityOrdertobeBinding
             )
             mViewModel.repay(map)
         }
-
+        getData()
     }
 
     private fun getData() {
@@ -67,18 +69,20 @@ class OrderTobeActivity : BaseActivity1<OrderViewModel, ActivityOrdertobeBinding
         mViewModel.orderdetail(map)
     }
 
-    override fun onResume() {
-        super.onResume()
-        getData()
+    override fun onRestart() {
+        super.onRestart()
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            getData()
+        }, 1000)
     }
     override fun createObserver() {
 
         mViewModel.payresultdata.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-                if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB==0) {
+                if (it.w9VJPY1aYx65wYI2JTt4s==0) {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.aWptfFdiAKe6gU8KTnX6y6VfmFieTcLTd))
                     startActivity(intent)
-                }else if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB==1) {
+                }else if (it.w9VJPY1aYx65wYI2JTt4s==1) {
                     val intent = Intent(this@OrderTobeActivity, WebActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     intent.putExtra("url", it.aWptfFdiAKe6gU8KTnX6y6VfmFieTcLTd)
@@ -101,11 +105,11 @@ class OrderTobeActivity : BaseActivity1<OrderViewModel, ActivityOrdertobeBinding
                 mViewBind.amount.text = "₹ " +  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.WA4R2qnu5lhz7.toString()
                 mViewBind.date.text =  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.sktzZnR1tYbzNliF0ZUNLSQLWwz6g3hlyscpj
 
-                mViewBind.receivedamount.text = "₹ " +  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.Ei5rFw3ggCfFFxvogcCvdtX.toString()
-                mViewBind.receivedate.text =  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.obhH38I5kIj71jbNKPzEFrKkelMHT
+                mViewBind.receivedamount.text = "₹ " +  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.noNz52nAR9teAGnKBK.toString()
+                mViewBind.receivedate.text =  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.H6R0CCiFv5HCTm5AJ63k
 
-                mViewBind.repaymentamount.text = "₹ " +  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.noNz52nAR9teAGnKBK.toString()
-                mViewBind.repaymentdate.text =  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.H6R0CCiFv5HCTm5AJ63k
+                mViewBind.repaymentamount.text = "₹ " +  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.Ei5rFw3ggCfFFxvogcCvdtX.toString()
+                mViewBind.repaymentdate.text =  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.obhH38I5kIj71jbNKPzEFrKkelMHT
 
                 mViewBind.charge.text = "₹ " + it.M7CdaEiz0WPh1Cs3iyzkg6Od?.nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN.toString()
                 mViewBind.overdate.text = it.M7CdaEiz0WPh1Cs3iyzkg6Od?.nMPtLLw7ysMUUZ3W6clfFgpCS9C

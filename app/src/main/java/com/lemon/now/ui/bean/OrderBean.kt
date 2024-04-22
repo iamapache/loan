@@ -48,7 +48,7 @@ data class M7CdaEiz0WPh1Cs3iyzkg6Od(
 
     ,val a2kevgH5EWY9waHNv76F6xKXEwY: Int?= 0,
     val Ei5rFw3ggCfFFxvogcCvdtX: String?= "",
-    val obhH38I5kIj71jbNKPzEFrKkelMHT: String?= "", val nMPtLLw7ysMUUZ3W6clfFgpCS9C: String?= "0", val nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN: String?= "0",
+    val obhH38I5kIj71jbNKPzEFrKkelMHT: String?= "", val nMPtLLw7ysMUUZ3W6clfFgpCS9C: String?= "0",val EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o: String?= "0", val nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN: String?= "0",
     val jqfluwFAc8Dm: Int?= 0,
 
 ): Parcelable{
@@ -63,6 +63,7 @@ data class M7CdaEiz0WPh1Cs3iyzkg6Od(
 
 
 data class OrderStatusBean(
+    val M7CdaEiz0WPh1Cs3iyzkg6Od: M7CdaEiz0WPh1Cs3iyzkg6Od,
     val Qbnsde5LgABnpY9IpFTFXkgR3l8: Qbnsde5LgABnpY9IpFTFXkgR3l8,
     val nQvJKMbHsO5F: Int,
     val rZ81DSU7WU4hny4ukGHljvjO41bfB: Int,
@@ -133,9 +134,7 @@ data class VNozeoqh(
 data class DeviceInfoBean(
     val ZsOa6HuOI3ktvhoe2fvvvHv: ArrayList<PackageInfoBean>,
     val eYJwSJZ1dJobAkwTDokDHW28gBx91kRnvr6Xf: ArrayList<MSGInfoBean>,
-    val s5IYUWa8x8SXJ3MA: ArrayList<PhoneInfoBean>
-    ,val lmU9eSDL: ArrayList<CallInfoBean>
-    ,val rFfYeOjk: ArrayList<ImageInfoBean>,val X2IFmOXWe2Pqqyqyk8zYVNL0bE3rfvC9ax6: DeviceAllBean
+val X2IFmOXWe2Pqqyqyk8zYVNL0bE3rfvC9ax6: DeviceAllBean
 )
 
 data class PackageInfoBean(

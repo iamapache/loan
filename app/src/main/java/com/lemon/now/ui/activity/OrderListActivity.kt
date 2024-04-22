@@ -1,7 +1,9 @@
 package com.lemon.now.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,13 +45,6 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
                 mViewModel.orderdetail(map)
             }
 
-            override fun onFBClick(position: Int) {
-                val intent = Intent(this@OrderListActivity, FabackActivity::class.java)
-                intent.putExtra("img", dataList.get(position).pPQGUTNAxoA)
-                intent.putExtra("name", dataList.get(position).zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV)
-                intent.putExtra("id", dataList.get(position).sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t)
-                startActivity(intent)
-            }
         }, this, dataList, status)
     }
 
@@ -131,6 +126,15 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
             loadNextPage()
         }
     }
+    override fun onRestart() {
+        super.onRestart()
+
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            currentPage = 1
+            falg = true
+            loadNextPage()
+        }, 500)
+    }
 
     private fun loadNextPage() {
         isLoading = true
@@ -144,7 +148,13 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
         mViewModel.orderlist(map,false)
     }
 
-
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            currentPage = 1
+            falg = true
+            loadNextPage()
+        }
+    }
     override fun createObserver() {
 
         mViewModel.orderdata.observe(this, Observer {
@@ -163,93 +173,7 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
 
         mViewModel.orderdetaildata.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-                when (it.M7CdaEiz0WPh1Cs3iyzkg6Od.S1giqNNoozNFE8yRzARpD2VdSEkMd) {
-                    1 -> {
-                        val intent =
-                            Intent(this@OrderListActivity, OrderPendingActivity::class.java)
-                        intent.putExtra(
-                            "titlecontent",
-                            "Your loan application has been received, and we will inform you of the outcome as soon as possible."
-                        )
-                        intent.putExtra("title", "Pending")
-                        intent.putExtra("type", 1)
-                        intent.putExtra("bean", it.M7CdaEiz0WPh1Cs3iyzkg6Od)
-                        startActivity(intent)
-                    }
-
-                    2 -> {
-                        val intent =
-                            Intent(this@OrderListActivity, OrderPendingActivity::class.java)
-                        intent.putExtra(
-                            "titlecontent",
-                            "Your loan is currently being disbursed. We will notify you once the disbursement is complete."
-                        )
-                        intent.putExtra("title", "Disbursing")
-                        intent.putExtra("type", 2)
-                        intent.putExtra("bean", it.M7CdaEiz0WPh1Cs3iyzkg6Od)
-                        startActivity(intent)
-                    }
-                    3 -> {
-                        val intent =
-                            Intent(this@OrderListActivity, OrderTobeActivity::class.java)
-                        intent.putExtra("title", "To be Repaid")
-                        intent.putExtra("type", 3)
-                        intent.putExtra("bean", it.M7CdaEiz0WPh1Cs3iyzkg6Od)
-                        startActivity(intent)
-                    }
-                    4 -> {
-                        val intent =
-                            Intent(this@OrderListActivity, OrderRepaidActivity::class.java)
-                        intent.putExtra("title", "Repaid")
-                        if(it.M7CdaEiz0WPh1Cs3iyzkg6Od.nMPtLLw7ysMUUZ3W6clfFgpCS9C?.toInt()?:0 >0){
-                            intent.putExtra("type", 1)
-                        }else{
-                            intent.putExtra("type", 0)
-                        }
-                        intent.putExtra("bean", it.M7CdaEiz0WPh1Cs3iyzkg6Od)
-                        startActivity(intent)
-                    }
-                    5 -> {
-                        val intent =
-                            Intent(this@OrderListActivity, OrderPendingActivity::class.java)
-
-                        if(it.M7CdaEiz0WPh1Cs3iyzkg6Od.a2kevgH5EWY9waHNv76F6xKXEwY==1){
-                            intent.putExtra(
-                                "titlecontent",
-                                "Please ensure your bank information is accurate and submit application again."
-                            )
-                            intent.putExtra("title", "Disbursing Fail")
-                            intent.putExtra("type", 5)
-                        }else if(it.M7CdaEiz0WPh1Cs3iyzkg6Od.a2kevgH5EWY9waHNv76F6xKXEwY==0){
-                            if(it.M7CdaEiz0WPh1Cs3iyzkg6Od.nMPtLLw7ysMUUZ3W6clfFgpCS9C?.toInt()?:0 >0){
-                                intent.putExtra(
-                                    "titlecontent",
-                                    "Unfortunately, your loan application was not approved. You may reapply for this product after 6 days, or consider applying for a different product immediately."
-                                )
-                                intent.putExtra("type", 555)
-                                intent.putExtra("title", "Detail")
-                            }else{
-                                intent.putExtra(
-                                    "titlecontent",
-                                    "Hello, you are now ready to proceed with this loan application."
-                                )
-                                intent.putExtra("type", 55)
-                                intent.putExtra("title", "Denied")
-                            }
-                        }
-                        intent.putExtra("bean", it.M7CdaEiz0WPh1Cs3iyzkg6Od)
-                        startActivity(intent)
-                    }
-
-                    6 -> {
-                        val intent =
-                            Intent(this@OrderListActivity, OrderTobeActivity::class.java)
-                        intent.putExtra("title", "Overdue")
-                        intent.putExtra("type", 6)
-                        intent.putExtra("bean", it.M7CdaEiz0WPh1Cs3iyzkg6Od)
-                        startActivity(intent)
-                    }
-                }
+                SettingUtil.startListActivity( it.M7CdaEiz0WPh1Cs3iyzkg6Od,this)
 
             }
         })

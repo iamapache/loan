@@ -28,7 +28,6 @@ fun <T> BaseViewModel.getData(
             loadingChange.dismissDialog.postValue(false)
             it.message?.loge()
             it.printStackTrace()
-            error(ExceptionHandle.handleException(it))
         }
     }
 }

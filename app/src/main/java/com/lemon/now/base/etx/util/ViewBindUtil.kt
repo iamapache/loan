@@ -17,6 +17,10 @@ fun <VB : ViewBinding> AppCompatActivity.bindingWithGeneric(layoutInflater: Layo
             binding.lifecycleOwner = this
         }
     }
+@Suppress("UNCHECKED_CAST")
+fun <VM> getVmClazz(obj: Any): VM {
+    return (obj.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as VM
+}
 
 
 private fun <VB : ViewBinding> bindingClass(any: Any, block: (Class<VB>) -> VB): VB {

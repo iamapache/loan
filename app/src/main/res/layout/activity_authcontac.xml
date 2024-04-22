@@ -21,12 +21,19 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
+            <LinearLayout
                 android:id="@+id/back"
-                android:layout_width="14dp"
-                android:layout_height="13dp"
-                android:layout_marginLeft="15dp"
-                android:background="@mipmap/icon_back" />
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+
+                    android:layout_width="14dp"
+                    android:layout_height="13dp"
+                    android:layout_marginLeft="15dp"
+                    android:background="@mipmap/icon_back" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/title"
@@ -74,7 +81,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        android:text="Tip: The more comprehensive your information, the easier it is to secure a loan."
+                        android:text="Tip: The more comprehensive your information, the easier it is to secure a application."
                         android:textColor="#ff333333"
                         android:textSize="16sp" />
 

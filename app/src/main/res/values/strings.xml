@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Lemon Cash</string>
+    <string name="app_name">Lemon Credit</string>
     <string name="toastinformation">Please provide the needed information</string>
 
     <string name="title1">Easy Online Processes</string>
-    <string name="title2">Expert Loan Services</string>
-    <string name="title3">Smooth and Quick Loans</string>
+    <string name="title2">Expert Services</string>
+    <string name="title3">High Credit Limit</string>
     <string name="autext1"><![CDATA[Clear & original documents]]></string>
 </resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="44dp">
+
+        <CheckBox
+            android:id="@+id/agreeCheckBox"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:button="@null"
+            android:background="@drawable/custom_checkbox_background"
+            android:checked="false" />
+
+        <TextView
+            android:id="@+id/agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:text="By continuing you agree our Terms  Conditions and Privacy Policy." />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_tx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="22dp"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:id="@+id/txrefuse"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_shapthtme10"
+            android:gravity="center"
+            android:text="Refuse"
+            android:textColor="@color/colorPrimary"
+            android:textSize="21sp" />
+
+        <TextView
+            android:id="@+id/txagree"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="13dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_shap"
+            android:gravity="center"
+            android:text="I Agree"
+            android:textColor="@color/white"
+            android:textSize="21sp" />
+    </LinearLayout>
+</LinearLayout>

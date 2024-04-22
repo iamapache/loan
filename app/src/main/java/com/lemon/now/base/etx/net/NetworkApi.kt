@@ -26,7 +26,7 @@ class NetworkApi : BaseNetworkApi() {
     override fun setHttpClientBuilder(builder: OkHttpClient.Builder): OkHttpClient.Builder {
         builder.apply {
             addInterceptor(MyHeadInterceptor())
-            addInterceptor(TokenOutInterceptor()).addInterceptor( LoggingInterceptor())
+            addInterceptor(TokenOutInterceptor()).addInterceptor( BodyInterceptor())
             getHttpLoggingInterceptor()?.let { addInterceptor(it) }
             connectTimeout(10, TimeUnit.SECONDS)
             readTimeout(5, TimeUnit.SECONDS)

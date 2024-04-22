@@ -36,7 +36,6 @@ import java.util.UUID
 class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
     companion object {
         private const val REQUEST_CODE_PERMISSION_CAMERA = 100
-        private const val REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE = 101
     }
 
     private var imageCapture: ImageCapture? = null
@@ -48,7 +47,7 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
         } else {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                arrayOf(Manifest.permission.CAMERA),
                 REQUEST_CODE_PERMISSION_CAMERA
             )
         }
@@ -81,10 +80,6 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
         return (ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED)
     }
 
@@ -113,7 +108,7 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(
-            externalMediaDirs.firstOrNull()?: cacheDir,
+            cacheDir,
             "${
                 SimpleDateFormat(
                     "yyyy-MM-dd",
@@ -133,21 +128,9 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
                 ContextCompat.getMainExecutor(this),
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                        val param1 = intent.getIntExtra("param1", 1)
-                        var bitmap: Bitmap? =null
 
-                        if (param1 == 1) {
-                            bitmap =
-                                BitmapFactory.decodeFile("/storage/emulated/0/Android/media/com.lemon.now.online/2024-04-17/QEwbbq7EWftpSMsC8ACVRbpKmLb.jpg")
-                        }  else if (param1 == 2) {
-                            bitmap =
-                                BitmapFactory.decodeFile("/storage/emulated/0/Android/media/com.lemon.now.online/2024-04-17/a9KBNnr29EYqs4aYGBymW1u6.png")
-                        } else if (param1 == 3) {
-                            bitmap =
-                                BitmapFactory.decodeFile("/storage/emulated/0/Android/media/com.lemon.now.online/2024-04-17/rZ81DSU7WU4hny4ukGHljvjO41bfB.jpg")
-                        }
-//                        var   bitmap =
-//                                BitmapFactory.decodeFile(oldFolder.absolutePath)
+                        var   bitmap =
+                                BitmapFactory.decodeFile(oldFolder.absolutePath)
                         val compressedImageData = compressBitmapToByteArray(bitmap!!, 200 * 1024)
                         val newFolder = File(photoFile, "${UUID.randomUUID()}.jpg")
                         saveBitmapToFile(compressedImageData, newFolder)
@@ -171,11 +154,6 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
                     }
                 })
         } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE
-            )
         }
     }
     fun compressBitmapToByteArray(bitmap: Bitmap, maxSize: Int): ByteArray {
@@ -213,13 +191,6 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
                 }
             }
 
-            REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    takePhoto()
-                } else {
-                    finish()
-                }
-            }
         }
     }
 }

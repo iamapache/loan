@@ -12,6 +12,9 @@ import com.lemon.now.ui.model.HomeViewModel
  */
 class AboutusActivity : BaseActivity1<HomeViewModel, ActivityAboutsBinding>() {
     override fun initView(savedInstanceState: Bundle?) {
-        mViewBind.version.text="Version "+BuildConfig.VERSION_CODE.toString()
+        mViewBind.back.setOnClickListener {
+            finish()
+        }
+        mViewBind.version.text="Version "+BuildConfig.VERSION_NAME.toString()
     }
 }

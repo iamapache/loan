@@ -5,7 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.lemon.now.base.etx.getVmClazz
+import com.lemon.now.base.etx.util.getVmClazz
 import com.lemon.now.base.etx.util.notNull
 import com.lemon.now.base.viewmodel.BaseViewModel
 

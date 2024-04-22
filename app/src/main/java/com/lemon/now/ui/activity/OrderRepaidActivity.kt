@@ -22,26 +22,19 @@ class OrderRepaidActivity : BaseActivity1<OrderViewModel, ActivityOrderrepaidBin
 
     override fun initView(savedInstanceState: Bundle?) {
         var title = intent.getStringExtra("title")
-        var type = intent.getIntExtra("type", 0)
         mViewBind.back.setOnClickListener {
             finish()
         }
-        if (type == 0) {
-            mViewBind.lltype.visibility = View.GONE
-        } else {
-            mViewBind.lltype.visibility = View.VISIBLE
-        }
+
         mViewBind.title.text = title
 
         mViewBind.layoutProduct.next.setOnClickListener {
-            mViewBind.layoutProduct.next.setOnClickListener {
                 mViewModel.checkorderstatus(
                     productdd,
                     SettingUtil.isVpnConnected(this@OrderRepaidActivity).toString(),
                     SettingUtil.getAvailableSimSlots(this@OrderRepaidActivity).toString(),
                     SettingUtil.getActivatedSimCount(this@OrderRepaidActivity).toString()
                 )
-            }
         }
 
         var bean = intent.getParcelableExtra<M7CdaEiz0WPh1Cs3iyzkg6Od>("bean")
@@ -75,15 +68,20 @@ class OrderRepaidActivity : BaseActivity1<OrderViewModel, ActivityOrderrepaidBin
                 mViewBind.amount.text = "₹ " + bean?.WA4R2qnu5lhz7.toString()
                 mViewBind.date.text = bean?.sktzZnR1tYbzNliF0ZUNLSQLWwz6g3hlyscpj
 
-                mViewBind.receivedamount.text = "₹ " + bean?.Ei5rFw3ggCfFFxvogcCvdtX.toString()
-                mViewBind.receivedate.text = bean?.obhH38I5kIj71jbNKPzEFrKkelMHT
+                mViewBind.receivedamount.text = "₹ " + bean?.noNz52nAR9teAGnKBK.toString()
+                mViewBind.receivedate.text = bean?.H6R0CCiFv5HCTm5AJ63k
 
-                mViewBind.repaymentamount.text = "₹ " + bean?.noNz52nAR9teAGnKBK.toString()
-                mViewBind.repaymentdate.text = bean?.H6R0CCiFv5HCTm5AJ63k
+                mViewBind.repaymentamount.text = "₹ " + bean?.Ei5rFw3ggCfFFxvogcCvdtX.toString()
+                mViewBind.repaymentdate.text = bean?.obhH38I5kIj71jbNKPzEFrKkelMHT
 
+                if (bean?.nMPtLLw7ysMUUZ3W6clfFgpCS9C?.toInt()?:0 >0 ) {
+                    mViewBind.charge.text = "₹ " + bean?.nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN.toString()
+                    mViewBind.overdate.text = bean?.nMPtLLw7ysMUUZ3W6clfFgpCS9C
+                    mViewBind.lltype.visibility = View.VISIBLE
+                } else {
+                    mViewBind.lltype.visibility = View.GONE
+                }
 
-                mViewBind.charge.text = "₹ " + bean?.nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN.toString()
-                mViewBind.overdate.text = bean?.nMPtLLw7ysMUUZ3W6clfFgpCS9C
 
                 var current = 0
                 list?.let {
@@ -109,6 +107,12 @@ class OrderRepaidActivity : BaseActivity1<OrderViewModel, ActivityOrderrepaidBin
                         updata(list.get(current))
                     }
                 }
+            }
+        })
+
+        mViewModel.orderstatusdata.observe(this, Observer {
+            if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
+                SettingUtil.startOtherActivity(this, it, productdd)
             }
         })
     }

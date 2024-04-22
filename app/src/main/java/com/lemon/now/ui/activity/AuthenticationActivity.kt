@@ -19,6 +19,8 @@ import com.amazonaws.regions.Region
 import com.amazonaws.services.s3.AmazonS3Client
 import com.lemon.now.base.activity.BaseActivity1
 import com.lemon.now.base.etx.util.logv
+import com.lemon.now.base.etx.view.dismissLoadingExt
+import com.lemon.now.base.etx.view.showLoadingExt
 import com.lemon.now.online.databinding.ActivityAuthenticationBinding
 import com.lemon.now.ui.bean.AWSBean
 import com.lemon.now.ui.bean.Userbean
@@ -68,15 +70,10 @@ class AuthenticationActivity : BaseActivity1<AuthModel, ActivityAuthenticationBi
             intent.putExtra("param1", 3)
             requestDataLauncher.launch(intent)
         }
-
-        userbean = Userbean("Tedlapu Durga Bhavani","664187345733","female","31-01-1984","C/O Konala Ramulu, 29-128, seetha nagar, near governament junior college, Jangareddigudem, West Godavari, Andhra Pradesh - 534447",
-            "DZHPK9096P",
-            "india/img/2024-04-17/04eeca9b-213d-4ba2-b89c-426c4e1c6b58.jpg",
-            "india/img/2024-04-17/33d89bf2-c05e-4614-adca-847545819493.jpg"
-        ,"india/img/2024-04-17/18031713-46ff-4a11-a92b-4d599eda9d6e.jpg")
+        userbean = Userbean()
 
         mViewBind.next.setOnClickListener {
-            if(userbean?.userNames?.isNotEmpty() ==true&&userbean?.userNumber?.isNotEmpty() == true
+            if(userbean?.userNames?.isNotEmpty() ==true&&userbean?.userNumber?.isNotEmpty() == true&&userbean?.date?.isNotEmpty() == true
                 &&userbean?.panNumber?.isNotEmpty() == true&&userbean?.address?.isNotEmpty() == true
                 &&userbean?.frontimg?.isNotEmpty() == true&&userbean?.backimg?.isNotEmpty() == true
                 &&userbean?.male?.isNotEmpty() == true){
@@ -102,6 +99,7 @@ class AuthenticationActivity : BaseActivity1<AuthModel, ActivityAuthenticationBi
     }
 
     private fun updateimg(awsbean:AWSBean, param1: Int,file: File) {
+        showLoadingExt("loading")
         val credentials = BasicSessionCredentials(
             awsbean?.ckERDTGankxlbEoezBJ47wlSl?.accessKeyId,
             awsbean?.ckERDTGankxlbEoezBJ47wlSl?.secretAccessKey,
@@ -125,7 +123,7 @@ class AuthenticationActivity : BaseActivity1<AuthModel, ActivityAuthenticationBi
                 if (state.toString() === "COMPLETED") {
                     val imageUrl = "${awsbean?.ql04hxK6f7XCrL47zFHGrHl7STBwm98}/$key"
                     Log.i("S3", "上传完成" + imageUrl)
-
+                    dismissLoadingExt()
                     if (param1 == 1) {
                         val message = Message()
                         message.what = WORK_COMPLETED

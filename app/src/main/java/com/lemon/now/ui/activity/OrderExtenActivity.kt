@@ -3,6 +3,8 @@ package com.lemon.now.ui.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.lemon.now.base.activity.BaseActivity1
@@ -44,25 +46,30 @@ class OrderExtenActivity : BaseActivity1<OrderViewModel, ActivityOrderextenBindi
             dialog.setcontent("By paying a nominal extension fee, you can settle the entire bill at a later time.")
 
         }
-
-    }
-    override fun onResume() {
-        super.onResume()
-        var bean = intent.getParcelableExtra<M7CdaEiz0WPh1Cs3iyzkg6Od>("bean")
         val map = hashMapOf(
             "sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t" to bean?.sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t.toString()
         )
         mViewModel.extendetail(map)
     }
+    override fun onRestart() {
+        super.onRestart()
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            var bean = intent.getParcelableExtra<M7CdaEiz0WPh1Cs3iyzkg6Od>("bean")
+            val map = hashMapOf(
+                "sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t" to bean?.sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t.toString()
+            )
+            mViewModel.extendetail(map)
+        }, 1000)
+    }
     override fun createObserver() {
 
         mViewModel.payresultdata.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-                if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 0) {
+                if (it.w9VJPY1aYx65wYI2JTt4s == 0) {
                     val intent =
                         Intent(Intent.ACTION_VIEW, Uri.parse(it.aWptfFdiAKe6gU8KTnX6y6VfmFieTcLTd))
                     startActivity(intent)
-                } else if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
+                } else if (it.w9VJPY1aYx65wYI2JTt4s == 1) {
                     val intent = Intent(this@OrderExtenActivity, WebActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     intent.putExtra("url", it.aWptfFdiAKe6gU8KTnX6y6VfmFieTcLTd)
@@ -78,7 +85,7 @@ class OrderExtenActivity : BaseActivity1<OrderViewModel, ActivityOrderextenBindi
                 mViewBind.pfdroDCductName.text =  bean?.zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV
 
                 mViewBind.amount.text = "₹ " +  bean?.lKKVSauI0hrmQmhzt6A.toString()
-                mViewBind.date.text =  bean?.JQf1oh1cEBZVVL5yUx.toString()
+                mViewBind.date.text =  bean?.JQf1oh1cEBZVVL5yUx.toString()+" days"
 
                 mViewBind.receivedamount.text =bean?.IPpbpFEJ5.toString()
                 mViewBind.receivedate.text =   "₹ " +  bean?.Ei5rFw3ggCfFFxvogcCvdtX.toString()

@@ -58,10 +58,8 @@ class OrderAdapter(private val listener: OnItemClickListener, private val contex
     interface OnItemClickListener {
         fun onItemClick(position: Int)
 
-        fun onFBClick(position: Int)
     }
     inner class DataViewHolder(itemView: View) : ViewHolder(itemView) {
-        var orderfb = itemView.findViewById<ImageView>(R.id.orderfb)
         var productLogo = itemView.findViewById<ImageView>(R.id.productLogo)
         var ductName = itemView.findViewById<TextView>(R.id.ductName)
         var itemamount = itemView.findViewById<TextView>(R.id.itemamount)
@@ -71,10 +69,6 @@ class OrderAdapter(private val listener: OnItemClickListener, private val contex
         var tv_status = itemView.findViewById<TextView>(R.id.tv_status)
 
         init {
-            orderfb.setOnClickListener {
-                val position = adapterPosition
-                listener.onFBClick(position)
-            }
 
         }
 

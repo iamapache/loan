@@ -43,21 +43,11 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
             }
         }
         mViewBind.llfb.setOnClickListener {
-            if (loginToken.isNullOrEmpty()) {
                 startActivity(
                     Intent(
                         this@MainActivity,
-                        LoginActivity::class.java
-                    )
-                )
-            } else {
-                startActivity(
-                    Intent(
-                        this@MainActivity,
-                        FabackListActivity::class.java
-                    )
-                )
-            }
+                        WebActivity::class.java
+                    ))
         }
         mViewBind.llMine.setOnClickListener {
             startActivity(
@@ -67,7 +57,7 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
                 )
             )
         }
-        getHomeData()
+
         mViewBind.swipeRefreshLayout.setOnRefreshListener {
             getHomeData()
         }
@@ -76,6 +66,11 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getHomeData()
     }
 
     override fun onDestroy() {
@@ -127,12 +122,13 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
                     )
                 )
             }
+
         })
-        var current = 0
+
         mViewModel.homebean.observe(this, Observer {
             mViewBind.swipeRefreshLayout.isRefreshing = false
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-
+                var current = 0
                 var homebean = it
                 updata(it.o2Hvk1wvAGN[0])
                 productdd = it.o2Hvk1wvAGN[0].nJNb2VY6
@@ -187,22 +183,7 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
 
         mViewModel.orderstatusdata.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-                when (it.nQvJKMbHsO5F) {
-                    1 -> {
-                        val intent = Intent(this@MainActivity, AuthenticationActivity::class.java)
-                        startActivity(intent)
-
-                    }
-                    2 -> {
-                        val intent = Intent(this@MainActivity, OrderActivity::class.java)
-                        intent.putExtra("id", productdd)
-                        startActivity(intent)
-                    }
-                    3 -> {
-                        val intent = Intent(this@MainActivity, OrderListActivity::class.java)
-                        startActivity(intent)
-                    }
-                }
+                SettingUtil.startOtherActivity(this, it, productdd)
             }else {
                 ToastUtils.showShort(this@MainActivity, it.vWCgp64OkxPVoGqics)
             }

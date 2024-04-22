@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.Signature
 import android.net.ConnectivityManager
@@ -22,7 +23,15 @@ import android.util.Base64
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import com.lemon.now.online.BuildConfig
+import com.lemon.now.ui.activity.AuthenticationActivity
+import com.lemon.now.ui.activity.OrderActivity
+import com.lemon.now.ui.activity.OrderPendingActivity
+import com.lemon.now.ui.activity.OrderRepaidActivity
+import com.lemon.now.ui.activity.OrderTobeActivity
+import com.lemon.now.ui.bean.M7CdaEiz0WPh1Cs3iyzkg6Od
+import com.lemon.now.ui.bean.OrderStatusBean
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.Inet4Address
@@ -37,6 +46,111 @@ import java.util.zip.Deflater
 
 
 object SettingUtil {
+
+     fun startOtherActivity(context: Context,it: OrderStatusBean,productdd:String) {
+        when (it.nQvJKMbHsO5F) {
+            1 -> {
+                val intent = Intent(context, AuthenticationActivity::class.java)
+                context.startActivity(intent)
+
+            }
+
+            2 -> {
+                val intent = Intent(context, OrderActivity::class.java)
+                intent.putExtra("id", productdd)
+                context.startActivity(intent)
+            }
+
+            3 -> {
+                startListActivity(it.M7CdaEiz0WPh1Cs3iyzkg6Od, context)
+            }
+        }
+    }
+
+    fun startListActivity(it: M7CdaEiz0WPh1Cs3iyzkg6Od, context: Context) {
+        when (it.S1giqNNoozNFE8yRzARpD2VdSEkMd) {
+            1 -> {
+                val intent =
+                    Intent(context, OrderPendingActivity::class.java)
+                intent.putExtra(
+                    "titlecontent",
+                    "Your application has been received, and we will inform you of the outcome as soon as possible."
+                )
+                intent.putExtra("title", "Pending")
+                intent.putExtra("type", 1)
+                intent.putExtra("bean", it)
+                context.startActivity(intent)
+            }
+
+            2 -> {
+                val intent =
+                    Intent(context, OrderPendingActivity::class.java)
+                intent.putExtra(
+                    "titlecontent",
+                    "Your application is currently being disbursed. We will notify you once the disbursement is complete."
+                )
+                intent.putExtra("title", "Disbursing")
+                intent.putExtra("type", 2)
+                intent.putExtra("bean", it)
+                context.startActivity(intent)
+            }
+
+            3 -> {
+                val intent =
+                    Intent(context, OrderTobeActivity::class.java)
+                intent.putExtra("title", "To be Repaid")
+                intent.putExtra("type", 3)
+                intent.putExtra("bean", it)
+                context.startActivity(intent)
+            }
+
+            4 -> {
+                val intent =
+                    Intent(context, OrderRepaidActivity::class.java)
+                intent.putExtra("title", "Repaid")
+                intent.putExtra("bean", it)
+                context.startActivity(intent)
+            }
+
+            5 -> {
+                val intent =
+                    Intent(context, OrderPendingActivity::class.java)
+
+                if (it.a2kevgH5EWY9waHNv76F6xKXEwY == 1) {
+                    intent.putExtra(
+                        "titlecontent",
+                        "Please ensure your bank information is accurate and submit application again."
+                    )
+                    intent.putExtra("title", "Disbursing Fail")
+                    intent.putExtra("type", 5)
+                } else if (it.a2kevgH5EWY9waHNv76F6xKXEwY == 0) {
+                    if (it.EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o?.toInt() ?: 0 > 0) {
+                        intent.putExtra(
+                            "titlecontent",
+                            "Hello, you are now ready to proceed with this application."
+                        )
+                        intent.putExtra("type", 555)
+                        intent.putExtra("title", "Detail")
+                    } else {
+                        intent.putExtra("type", 55)
+                        intent.putExtra("title", "Denied")
+                    }
+                }
+                intent.putExtra("bean", it)
+                context.startActivity(intent)
+            }
+
+            6 -> {
+                val intent =
+                    Intent(context, OrderTobeActivity::class.java)
+                intent.putExtra("title", "Overdue")
+                intent.putExtra("type", 6)
+                intent.putExtra("bean", it)
+                context.startActivity(intent)
+            }
+        }
+    }
+
     private fun deleteDir(dir: File): Boolean {
         if (dir.isDirectory) {
             val children = dir.list()

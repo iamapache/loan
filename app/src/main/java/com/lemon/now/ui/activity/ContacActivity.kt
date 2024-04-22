@@ -1,11 +1,8 @@
 package com.lemon.now.ui.activity
 
 import ToastUtils
-import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.LayoutInflater
@@ -15,8 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Observer
 import com.lemon.now.base.activity.BaseActivity1
 import com.lemon.now.online.R
@@ -39,19 +35,7 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
             finish()
         }
 
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            mViewModel.authinfo()
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_CONTACTS),
-                READ_CONTACTS_PERMISSION_REQUEST_CODE
-            )
-        }
+        mViewModel.authinfo()
         var contactNum = intent.getIntExtra("contactNum",2)
 
         for (i in 1 .. contactNum) {
@@ -120,8 +104,26 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
                 ToastUtils.showShort(this@ContacActivity,it.vWCgp64OkxPVoGqics)
             }
         })
-    }
 
+
+
+    }
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val contactUri: Uri = result.data?.data ?: return@registerForActivityResult
+            val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER)
+            contentResolver.query(contactUri, projection, null, null, null).use { cursor ->
+                if (cursor != null && cursor.moveToFirst()) {
+                    val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                    val displayName = cursor.getString(nameIndex)
+                    val phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    val phoneNumber = cursor.getString(phoneIndex)
+                    nameEditText?.setText(displayName)
+                    relationEditText?.setText(phoneNumber)
+                }
+            }
+        }
+    }
     private fun ContacActivity.extracted(it: AuthInfoBean) {
         for (i in 0 until mViewBind.containerLayout.childCount) {
             val childView = mViewBind.containerLayout.getChildAt(i)
@@ -150,64 +152,14 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
                     nameEditText = name
                     relationEditText = number
                     val intent =
-                        Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-                    startActivityForResult(intent, CONTACT_PICKER_REQUEST)
+                        Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                    resultLauncher.launch(intent)
                 }
             }
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == READ_CONTACTS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mViewModel.authinfo()
-            } else {
-                finish()
-            }
-        }
-    }
-
-    @SuppressLint("Range")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CONTACT_PICKER_REQUEST && resultCode == Activity.RESULT_OK) {
-            val contactData = data?.data ?: return
-            val cursor = contentResolver.query(contactData, null, null, null, null)
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val name =
-                        cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                    nameEditText?.setText(name)
-                    val id = it.getString(it.getColumnIndex(ContactsContract.Contacts._ID))
-                    val phoneCursor = contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
-                        arrayOf(id),
-                        null
-                    )
-                    phoneCursor?.use { phoneCursor ->
-                        if (phoneCursor.moveToFirst()) {
-                            val phoneNumber =
-                                phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                            relationEditText?.setText(phoneNumber)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    companion object {
-        private const val CONTACT_PICKER_REQUEST = 1001
-        private const val READ_CONTACTS_PERMISSION_REQUEST_CODE = 101
-    }
 
     private fun addRowLayout() {
         val inflater = LayoutInflater.from(this)

@@ -1,7 +1,6 @@
 package com.lemon.now.ui.activity
 
 import ToastUtils
-import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -21,62 +20,48 @@ class OrderSuccesActivity : BaseActivity1<OrderViewModel, ActivityOrdersuccesBin
         }
         val receivedList = intent.getParcelableArrayListExtra<O2Hvk1wvAGN>("list")
         var current = 0
-        receivedList?.get(0)?.let {
-            updata(it)
-            productdd = it.nJNb2VY6
-            mViewBind.layoutProduct.fendata.text = (current + 1).toString() + "/" + receivedList.size
-        }
-        receivedList?.let {
-            mViewBind.layoutProduct.profileBack.setOnClickListener {
-                if (current > 0 && current <= receivedList.size - 1) {
-                    current--
-                    mViewBind.layoutProduct.fendata.text =
-                        (current + 1).toString() + "/" + receivedList.size
-                    updata(receivedList.get(current))
-                }
+        if(receivedList?.size!! >0){
+            receivedList?.get(0)?.let {
+                updata(it)
+                productdd = it.nJNb2VY6
+                mViewBind.layoutProduct.fendata.text = (current + 1).toString() + "/" + receivedList.size
+            }
+            receivedList?.let {
+                mViewBind.layoutProduct.profileBack.setOnClickListener {
+                    if (current > 0 && current <= receivedList.size - 1) {
+                        current--
+                        mViewBind.layoutProduct.fendata.text =
+                            (current + 1).toString() + "/" + receivedList.size
+                        updata(receivedList.get(current))
+                    }
 
-            }
-            mViewBind.layoutProduct.profileNext.setOnClickListener {
-                if (current >= 0 && current < receivedList.size - 1) {
-                    current++
-                    mViewBind.layoutProduct.fendata.text =
-                        (current + 1).toString() + "/" + receivedList.size
-                    updata(receivedList.get(current))
                 }
-            }
-        }
-                mViewBind.layoutProduct.next.setOnClickListener {
-                    mViewBind.layoutProduct.next.setOnClickListener {
-                        mViewModel.checkorderstatus(productdd,
-                            SettingUtil.isVpnConnected(this@OrderSuccesActivity).toString(),
-                            SettingUtil.getAvailableSimSlots(this@OrderSuccesActivity).toString(),
-                            SettingUtil.getActivatedSimCount(this@OrderSuccesActivity).toString())
+                mViewBind.layoutProduct.profileNext.setOnClickListener {
+                    if (current >= 0 && current < receivedList.size - 1) {
+                        current++
+                        mViewBind.layoutProduct.fendata.text =
+                            (current + 1).toString() + "/" + receivedList.size
+                        updata(receivedList.get(current))
                     }
                 }
+            }
+            mViewBind.layoutProduct.next.setOnClickListener {
+                    mViewModel.checkorderstatus(productdd,
+                        SettingUtil.isVpnConnected(this@OrderSuccesActivity).toString(),
+                        SettingUtil.getAvailableSimSlots(this@OrderSuccesActivity).toString(),
+                        SettingUtil.getActivatedSimCount(this@OrderSuccesActivity).toString())
+                }
+        }
+
 
     }
+
 
 
     override fun createObserver() {
         mViewModel.orderstatusdata.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-                when (it.nQvJKMbHsO5F) {
-                    1 -> {
-                        val intent = Intent(this@OrderSuccesActivity, AuthenticationActivity::class.java)
-                        startActivity(intent)
-
-                    }
-                    2 -> {
-                        val intent = Intent(this@OrderSuccesActivity, OrderActivity::class.java)
-                        intent.putExtra("id", productdd)
-                        startActivity(intent)
-                    }
-                    3 -> {
-                        val intent = Intent(this@OrderSuccesActivity, OrderListActivity::class.java)
-                        intent.putExtra("id", productdd)
-                        startActivity(intent)
-                    }
-                }
+                SettingUtil.startOtherActivity(this, it, productdd)
             }else {
                 ToastUtils.showShort(this@OrderSuccesActivity, it.vWCgp64OkxPVoGqics)
             }

@@ -5,8 +5,10 @@ import ToastUtils
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
@@ -80,6 +82,47 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
         if(intent.hasExtra("msg")){
             ToastUtils.showShort(this,"Login expire")
         }
+
+        mDatabind.editText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isNotEmpty()) {
+                    mDatabind.editText2.requestFocus()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+        mDatabind.editText2.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isNotEmpty()) {
+                    mDatabind.editText3.requestFocus()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+        mDatabind.editText3.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isNotEmpty()) {
+                    mDatabind.editText4.requestFocus()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
     }
 
     inner class ProxyClick {

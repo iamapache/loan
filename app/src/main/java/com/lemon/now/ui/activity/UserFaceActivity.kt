@@ -46,7 +46,6 @@ import java.util.UUID
 class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBinding>() {
     companion object {
         private const val REQUEST_CODE_PERMISSION_CAMERA = 100
-        private const val REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE = 101
     }
     private var imageCapture: ImageCapture? = null
     var url :String="";
@@ -62,7 +61,7 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         } else {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                arrayOf(Manifest.permission.CAMERA),
                 UserFaceActivity.REQUEST_CODE_PERMISSION_CAMERA
             )
         }
@@ -98,7 +97,7 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(
-            externalMediaDirs.firstOrNull(),
+            cacheDir,
             "${
                 SimpleDateFormat(
                     "yyyy-MM-dd",
@@ -111,7 +110,6 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         if (!oldFolder.exists()) {
             photoFile.mkdirs()
         }
-        if (allPermissionsGranted()) {
             val outputOptions = ImageCapture.OutputFileOptions.Builder(oldFolder).build()
             imageCapture.takePicture(
                 outputOptions,
@@ -146,22 +144,11 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
                         ).show()
                     }
                 })
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE
-            )
-        }
     }
     private fun allPermissionsGranted(): Boolean {
         return (ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED)
     }
 
@@ -226,13 +213,6 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
                 }
             }
 
-            REQUEST_CODE_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    takePhoto()
-                } else {
-                    finish()
-                }
-            }
         }
     }
 

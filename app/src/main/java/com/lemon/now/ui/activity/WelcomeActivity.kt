@@ -52,7 +52,7 @@ class WelcomeActivity : BaseActivity1<BaseViewModel, ActivityWelcomeBinding>() {
         if (isFirst){
             startActivity(Intent(this@WelcomeActivity, MainActivity::class.java))
         }else{
-             startActivity(Intent(this@WelcomeActivity, SplashActivity::class.java))
+             startActivity(Intent(this@WelcomeActivity, PrivacyActivity::class.java))
         }
              finish()
         }, 3000)
@@ -67,13 +67,11 @@ class WelcomeActivity : BaseActivity1<BaseViewModel, ActivityWelcomeBinding>() {
                     InstallReferrerClient.InstallReferrerResponse.OK -> {
                         val response: ReferrerDetails = installReferrerClient.installReferrer
                         val referrerUrl: String = response.installReferrer
-                        val referrerClickTime: Long = response.referrerClickTimestampSeconds
                         Adjust.setReferrer(referrerUrl, applicationContext)
                         installReferrerClient.endConnection()
                         var referrerurl:   String by SPUtil("referrerurl", "")
                         referrerurl=referrerUrl
                     }
-                    // ...
                 }
             }
 

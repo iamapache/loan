@@ -12,10 +12,10 @@ import java.util.UUID
 
 /**
  *   Lemon Cash
- *  LoggingInterceptor.java
+ *  BodyInterceptor.java
  *
  */
-class LoggingInterceptor : Interceptor {
+class BodyInterceptor : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()

@@ -1,5 +1,6 @@
 package com.lemon.now.ui.activity
 
+import ToastUtils
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
@@ -11,6 +12,7 @@ import com.lemon.now.ui.bean.M7CdaEiz0WPh1Cs3iyzkg6Od
 import com.lemon.now.ui.bean.O2Hvk1wvAGN
 import com.lemon.now.ui.model.OrderViewModel
 import com.lemon.now.util.SettingUtil
+import com.lemon.now.util.SettingUtil.startOtherActivity
 import kotlin.random.Random
 
 /**
@@ -37,6 +39,7 @@ class OrderPendingActivity : BaseActivity1<OrderViewModel, ActivityOrderpendBind
         }else  if (type == 5){
             mViewBind.llbg.setBackgroundResource(R.mipmap.orderdisfail)
             mViewBind.llpruduct.visibility= View.GONE
+            mViewBind.llid.visibility= View.VISIBLE
         }else  if (type == 55){
             mViewBind.llbg.setBackgroundResource(R.mipmap.orderdeined)
         }else  if (type == 555){
@@ -69,49 +72,68 @@ class OrderPendingActivity : BaseActivity1<OrderViewModel, ActivityOrderpendBind
                 var list =it.o2Hvk1wvAGN
                 Glide.with(this).load(bean?.pPQGUTNAxoA).into(mViewBind.productLogo)
                 mViewBind.pfdroDCductName.text =  bean?.zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV
-
+                mViewBind.orderid.text =  it.M7CdaEiz0WPh1Cs3iyzkg6Od?.sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t
 
                 mViewBind.amount.text = "₹ " +  bean?.WA4R2qnu5lhz7.toString()
                 mViewBind.date.text =  bean?.sktzZnR1tYbzNliF0ZUNLSQLWwz6g3hlyscpj
                 mViewBind.totalcount.text =  bean?.DKrmZAi6bHIGWRJN4qbI3yF5dnLuuo12hBh
-
+                if(it.M7CdaEiz0WPh1Cs3iyzkg6Od.a2kevgH5EWY9waHNv76F6xKXEwY==0) {
+                    if (it.M7CdaEiz0WPh1Cs3iyzkg6Od.EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o?.toInt() ?: 0 > 0) {
+                        mViewBind.titlecontent.text =
+                            "Unfortunately, your application was not approved. You may reapply for this product after ${it.M7CdaEiz0WPh1Cs3iyzkg6Od.EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o} days, or consider applying for a different product immediately."
+                    }
+                }
                 var current = 0
-                list?.let {
-                    updata(it[0])
-                    productdd = it[0].nJNb2VY6
-                    mViewBind.layoutProduct.fendata.text = (current + 1).toString() + "/" + list.size
-                }
-                list?.let {
-                    mViewBind.layoutProduct.profileBack.setOnClickListener {
-                        if (current > 0 && current <= list.size - 1) {
-                            current--
-                            mViewBind.layoutProduct.fendata.text =
-                                (current + 1).toString() + "/" + list.size
-                            updata(list.get(current))
-                        }
+                if(list.size>0){
+                    list[0].let {
+                        updata(it)
+                        productdd = it.nJNb2VY6
+                        mViewBind.layoutProduct.fendata.text = (current + 1).toString() + "/" + list.size
+                    }
+                    list.let {
+                        mViewBind.layoutProduct.profileBack.setOnClickListener {
+                            if (current > 0 && current <= list.size - 1) {
+                                current--
+                                mViewBind.layoutProduct.fendata.text =
+                                    (current + 1).toString() + "/" + list.size
+                                updata(list.get(current))
+                            }
 
-                    }
-                    mViewBind.layoutProduct.profileNext.setOnClickListener {
-                        if (current >= 0 && current < list.size - 1) {
-                            current++
-                            mViewBind.layoutProduct.fendata.text =
-                                (current + 1).toString() + "/" + list.size
-                            updata(list.get(current))
+                        }
+                        mViewBind.layoutProduct.profileNext.setOnClickListener {
+                            if (current >= 0 && current < list.size - 1) {
+                                current++
+                                mViewBind.layoutProduct.fendata.text =
+                                    (current + 1).toString() + "/" + list.size
+                                updata(list.get(current))
+                            }
                         }
                     }
-                }
-                mViewBind.layoutProduct.next.setOnClickListener {
                     mViewBind.layoutProduct.next.setOnClickListener {
-                        mViewModel.checkorderstatus(productdd,
-                            SettingUtil.isVpnConnected(this@OrderPendingActivity).toString(),
-                            SettingUtil.getAvailableSimSlots(this@OrderPendingActivity).toString(),
-                            SettingUtil.getActivatedSimCount(this@OrderPendingActivity).toString())
+                            mViewModel.checkorderstatus(productdd,
+                                SettingUtil.isVpnConnected(this@OrderPendingActivity).toString(),
+                                SettingUtil.getAvailableSimSlots(this@OrderPendingActivity).toString(),
+                                SettingUtil.getActivatedSimCount(this@OrderPendingActivity).toString())
                     }
+                }else{
+                    mViewBind.llpruduct.visibility= View.GONE
                 }
+
 
             }
         })
+
+        mViewModel.orderstatusdata.observe(this, Observer {
+            if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
+                startOtherActivity(this,it,productdd)
+            }else {
+                ToastUtils.showShort(this@OrderPendingActivity, it.vWCgp64OkxPVoGqics)
+            }
+        })
     }
+
+
+
     private fun updata(it: O2Hvk1wvAGN) {
         mViewBind.layoutProduct.pfdroDCductName.text = it.zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV
         mViewBind.layoutProduct.productAmount.text =
