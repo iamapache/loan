@@ -2,6 +2,11 @@
     <string name="app_name">Lemon Credit</string>
     <string name="toastinformation">Please provide the needed information</string>
 
+    <string name="facebook_app_id">1377938709555582</string>
+    <string name="fb_login_protocol_scheme">fb1377938709555582</string>
+    <string name="facebook_client_token">f5b674cb8a3858e4b6338a5f0e17a28b</string>
+
+
     <string name="title1">Easy Online Processes</string>
     <string name="title2">Expert Services</string>
     <string name="title3">High Credit Limit</string>

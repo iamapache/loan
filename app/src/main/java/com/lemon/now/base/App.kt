@@ -7,7 +7,11 @@ import android.support.multidex.MultiDex
 import android.util.Log
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustConfig
+import com.facebook.FacebookSdk
+import com.facebook.LoggingBehavior
+import com.facebook.appevents.AppEventsLogger
 import com.lemon.now.base.etx.BaseApp
+import com.lemon.now.online.BuildConfig
 import com.lemon.now.ui.ApiService
 
 
@@ -22,10 +26,17 @@ class App : BaseApp() {
         instance = this
         SPUtil.setContext(this)
 
-        val appToken: String = "315msipsqygw"
-        val environment: String = AdjustConfig.ENVIRONMENT_SANDBOX
+
+        val appToken: String = "hy5alh7rzpq8"
+        val environment: String =  AdjustConfig.ENVIRONMENT_PRODUCTION
         val config = AdjustConfig(this, appToken, environment)
         config.setUrlStrategy(AdjustConfig.URL_STRATEGY_CHINA);
+        if(BuildConfig.DEBUG){
+            FacebookSdk.setIsDebugEnabled(true);
+            FacebookSdk.addLoggingBehavior(LoggingBehavior.APP_EVENTS)
+            val logger = AppEventsLogger.newLogger(this)
+            logger.logEvent("FacebookSdk")
+        }
         config.setOnEventTrackingSucceededListener { eventSuccessResponseData ->
             Log.v(
                 "println",

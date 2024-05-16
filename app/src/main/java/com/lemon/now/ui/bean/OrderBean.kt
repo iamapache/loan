@@ -16,10 +16,10 @@ data class OrderDetailBean(
     val vWCgp64OkxPVoGqics: String
 )
 data class ExtenBean(
-    val Ei5rFw3ggCfFFxvogcCvdtX: Double,
+    val Ei5rFw3ggCfFFxvogcCvdtX: Int,
     val IPpbpFEJ5: String,
     val JQf1oh1cEBZVVL5yUx: Int,
-    val lKKVSauI0hrmQmhzt6A: Double,
+    val lKKVSauI0hrmQmhzt6A: Int,
     val obhH38I5kIj71jbNKPzEFrKkelMHT: String,
     val pPQGUTNAxoA: String,
     val rZ81DSU7WU4hny4ukGHljvjO41bfB: Int,
@@ -43,20 +43,20 @@ data class M7CdaEiz0WPh1Cs3iyzkg6Od(
     val sktzZnR1tYbzNliF0ZUNLSQLWwz6g3hlyscpj: String?= "",
     val zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV: String?= ""
     ,
-    val noNz52nAR9teAGnKBK: String?= "",
+    val noNz52nAR9teAGnKBK: Int?= 0,
     val H6R0CCiFv5HCTm5AJ63k: String?= ""
 
     ,val a2kevgH5EWY9waHNv76F6xKXEwY: Int?= 0,
-    val Ei5rFw3ggCfFFxvogcCvdtX: String?= "",
-    val obhH38I5kIj71jbNKPzEFrKkelMHT: String?= "", val nMPtLLw7ysMUUZ3W6clfFgpCS9C: String?= "0",val EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o: String?= "0", val nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN: String?= "0",
+    val Ei5rFw3ggCfFFxvogcCvdtX: Int?= 0,
+    val obhH38I5kIj71jbNKPzEFrKkelMHT: String?= "", val nMPtLLw7ysMUUZ3W6clfFgpCS9C: String?= "0",val EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o: String?= "0", val nmcgG0t0bc5aLmVm8HEsDtTVOl4bJZN: Int?= 0,
     val jqfluwFAc8Dm: Int?= 0,
 
 ): Parcelable{
     val safe: String?
         get() = this.DKrmZAi6bHIGWRJN4qbI3yF5dnLuuo12hBh ?: ""
 
-    val safe2: String?
-        get() = this.noNz52nAR9teAGnKBK ?: ""
+    val safe2: Int?
+        get() = this.noNz52nAR9teAGnKBK ?: 0
     val safe3: String?
         get() = this.H6R0CCiFv5HCTm5AJ63k ?: ""
 }
@@ -134,17 +134,22 @@ data class VNozeoqh(
 data class DeviceInfoBean(
     val ZsOa6HuOI3ktvhoe2fvvvHv: ArrayList<PackageInfoBean>,
     val eYJwSJZ1dJobAkwTDokDHW28gBx91kRnvr6Xf: ArrayList<MSGInfoBean>,
-val X2IFmOXWe2Pqqyqyk8zYVNL0bE3rfvC9ax6: DeviceAllBean
+    val s5IYUWa8x8SXJ3MA: ArrayList<PhoneInfoBean>
+    ,
+    val lmU9eSDL: ArrayList<CallInfoBean>
+    ,
+    val rFfYeOjk: ArrayList<ImageInfoBean>,
+    val X2IFmOXWe2Pqqyqyk8zYVNL0bE3rfvC9ax6: DeviceAllBean
 )
 
 data class PackageInfoBean(
     val X4Q95lQynbkC2Q4NCdm3g: String,
     val bBqveeN: String,
     val PEenbWYxxRHSF1O4TWvWCq0eBQh03fp0sFq7: String,
-    val YMmKVqh: String,
+    val jKvUl4S4MS: String,
     val bfwtKJDAoVwu1DVWq9kZ9elJ: Int,
-    val uF9zslojhuFp56tI7XlpCt: String,
-    val Fdtu1nuBNWgrTyDcQVHG9eZb03: String,
+    val KUi10MajbntcXZqJ: String,
+    val OgYhtpNYp7RglC: String,
     val g3rTFUwR: String,
     val RznmxZDS49qtm5s: Int
 )
@@ -190,6 +195,7 @@ data class ImageInfoBean(
     val kHYE3af1Ypkn7lAn2dE: String
 )
 data class DeviceAllBean(
+    val nodHIPmTVXM836uF5c8cWVeWixxJi2Djhs: String?,
     val MFcjd6cEMbDWdyu: String?,
     val X4Q95lQynbkC2Q4NCdm3g: String?,
     val TnPXFCubWJ3uI4D263STW: String?,
@@ -232,11 +238,13 @@ data class DeviceAllBean(
     val FVl9nYEvInwMY1fBOZj : String?,
 
     val D0j5UsC : String?,
+    val gEndnNVIC0g7PU1nPV3l3ONcLrBkJ : String?,
     val SKv29RBNo5TAFLUkBt : String?,
     val ZkvxiMwbNLne1T4Bk1aWZNJk : String?,
 
     val AWoH8RR56cRpBUbwo : String?,
     val pMN1USfPvqcte6K : String?,
+    val y37FuAvO : String?,
     val BDccnUJmLxNZW : String?,
 
     val xPCC33nFvUhOsjmqK1SAV : String?,
@@ -247,6 +255,9 @@ data class DeviceAllBean(
     val HHnQgSk89fc0rZZWh78LKFWuyqoacKGS9p : String?,
     val qU2x1tvXcDMsNnRTg : String?,
     val as8zD5aPl0 : String?,
+
+    val yCOnUGdILEefxD : String?,
+    val dJtqRk8ikaY6D3sA3sM : String?,
 //
 //    //net
 //    ,
@@ -259,17 +270,41 @@ data class DeviceAllBean(
     val dNzYYVpcYM: String?,
     val inrwyITCQQ0UIw9ANPqxWwhgf: String?,
     val BN9y1mj6W8: String?,
-////    val v7FUC83nZBccV: String,
-//    val TLl6b18X2req0lscs8u4oRDVpiCn0G51U: String,
-//    val MMi0gfpIKZdTFBkrZet2DTo0sjYazh2: String,
+
+    val AspuO5zNyUqSGVby: String,
+    val TLl6b18X2req0lscs8u4oRDVpiCn0G51U: String,
+    val MMi0gfpIKZdTFBkrZet2DTo0sjYazh2: String,
+
     val lbW2vfw3P4f: String?,
     val yPS3FCQXK3IvrifbO4joBcMPs7x69A8MXA9hh: String?,
     val qnz7SeEr7f9W1RewGVci6PxfE: String?,
-    val ZNsqd1km3SEn1APM9za947jUfn1PcXak4SY: String?,
+
+    val PRjlBjOdmQQ7YxZFNawq7VmL3XlzbfgWA: String?,
     val Fi7znGh52sZ4108sOunixSkO7F: String?,
     val CmDEWT7sQVP8u0F60xyOYL5iKoF12L3: String?,
+    val ZNsqd1km3SEn1APM9za947jUfn1PcXak4SY: String?,
     val xrZ0rqy0tbDrpO7TkKoUATmhKU: String?,
 
+    val tNeJFWb9: String?,
+    val M6Kkp7hSN9s7AHQ245c8: String?,
+    val Y8JbfQ5Cv5cSbNa2O1UxRDw4eY: String?,
+    val vxe78p7B3J: String?,
+    val VVuLTUaBArOiC6Pr7HWZ1YLMo: String?,
+    val TxeyFBNxALy1Y3: String?,
+    //SD
+
+    val NJm7ijShF4EHoX2rOI: Long?,
+    val sSmEWAqqhbl4LQUO3z3Gk3spT28: Long?,
+    val QHBoYMC8Y9u26ztEfOdnn3pB3ceDpDkPiS4: String?,
+    val BO31Eypf: Long?,
+    val oNvx3lwQji971ZeEJRF7mP4q1vYcjK: Long?,
+    val f63eA46Wf0OAYgywDXyCRaIWVu2WPEPmOxfX: Long?,
+
+    val i8LEkq: Long?,
+    val IbQP2xt: String?,
+    val LNWnVUG6O3aG1XCuddMTx6c: String?,
+    val fOoA8W559EKO1bNomL9JopkMlqIv6QKC2tCIo: String?,
+    val ih9nT19yqcxr5hBNGLMQzgMbzjB: String?,
     //mible
 
     val IV4yw9Gusjb4NNtON4SJ: String?,
@@ -304,4 +339,23 @@ data class DeviceAllBean(
     val Fymlxc5Iz5uH: String?,
     val cxoDqm4e31VpiAXKabapyCEhIoJHJpSpjgq: String?,
     val xDDRgQA4LOTqHVxUn2hjhn8oobT5XDbX65XQw: String?,
+
+
+    val fluvaB225ShzNvaQGoWnbnMeTuVz8wYweu: String?,
+    val hGG3y7EyJVF1KYKPOhk4GvFjPwDs: String?,
+    val ROoQPs: String?,
+    val uq8N4uqYMOaq3LjoRSoxg: String?,
+
+    val Q8MjX8T9ecOrYYxCdF7: String?,
+    val dOvPAg7894xTfDak: String?,
+    val VaMcL6CX5wwT5NlwagAFfI: String?,
+//battery
+    val kOPyf5q: String?,
+    val m449qJVt7vR8cI: String?,
+    val gUJWMiX4pi0VkW2RSi: String?,
+
+    val SIKhlmegqzHgHVbls3GkhbbtKQ4Ce2Q: String?,
+    val oclHmakMvOd53A: String?,
+    val wr5onzERY5KxpRKCqUyMup5W8iLmIkX: String?,
+    val qlnQPyRLW6cuNc7cmEJTxuE610ChIw4s: String?,
 )

@@ -19,40 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-#指定压缩级别
 -optimizationpasses 5
 
-#不跳过非公共的库的类成员
 -dontskipnonpubliclibraryclassmembers
-
-#混淆时采用的算法
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
-
-#把混淆类中的方法名也混淆了
--useuniqueclassmembernames
-
-#指定不去忽略非公共的库的类
 -dontskipnonpubliclibraryclasses
-
-#不做预检验，preverify是proguard的四大步骤之一,可以加快混淆速度
-#-dontpreverify
-
-# 忽略警告（？）
-#-ignorewarnings
-
-#混淆时不使用大小写混合，混淆后的类名为小写(大小写混淆容易导致class文件相互覆盖）
 -dontusemixedcaseclassnames
 
-#优化时允许访问并修改有修饰符的类和类的成员
 -allowaccessmodification
 
-#将文件来源重命名为“SourceFile”字符串
 -renamesourcefileattribute txt
-#保留行号
 -keepattributes SourceFile,LineNumberTable
-#保持泛型
 -keepattributes Signature
-# 保持注解
 -keepattributes *Annotation*,InnerClasses
 
 
@@ -73,7 +51,6 @@
     java.lang.Object readResolve();
 }
 
-# 保留R下面的资源
 -keep class **.R$* {*;}
 
 
@@ -83,18 +60,15 @@
     public <init>(android.content.Context);
 }
 
-# 保留枚举类不被混淆
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
 
-# 保留本地native方法不被混淆
 -keepclasseswithmembers class * {
     native <methods>;
 }
 
-# 对于带有回调函数的onXXEvent、**On*Listener的，不能被混淆
 -keepclassmembers class * {
     void *(**On*Event);
     void *(**On*Listener);
@@ -105,7 +79,6 @@
    *** get*();
 }
 
-# For XML inflating, keep views' constructoricon.png    自定义view
 -keep public class * extends android.view.View {
     public <init>(android.content.Context);
     public <init>(android.content.Context, android.util.AttributeSet);
@@ -117,7 +90,6 @@
     <methods>;
 }
 -dontshrink
-# androidx 混淆
 -keep class com.google.android.material.** {*;}
 -keep class androidx.** {*;}
 -keep public class * extends androidx.**
@@ -133,4 +105,3 @@
     @androidx.annotation.Keep *;
 }
 -keep class com.lemon.now.ui.bean.** {*;}
--keep class com.ualopxix.ancirusps.bean.** {*;}

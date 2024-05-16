@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.lemon.now.base.App
 import com.lemon.now.base.etx.net.apiService
 import com.lemon.now.base.etx.net.getData
+import com.lemon.now.base.etx.net.getData2
 import com.lemon.now.base.viewmodel.BaseViewModel
 import com.lemon.now.ui.bean.AWSBean
 import com.lemon.now.ui.bean.AuthInfoBean
@@ -25,19 +26,32 @@ class AuthModel : BaseViewModel() {
     var authinfoData = MutableLiveData<AuthInfoBean>()
     var orcData = MutableLiveData<ORCBean>()
     var homebean = MutableLiveData<HomeBean>()
+
     var submitdata = MutableLiveData<CommonData>()
     fun aws() {
         val map = hashMapOf("" to ""
         )
         getData({ apiService.aws(map)},{
             commonData.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 
     fun submitAuth(map: HashMap<String, String>) {
         getData({ apiService.submitAuth(map)},{
             submitdata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
+    }
+
+    fun submitAuth2(map: HashMap<String, String>) {
+        getData2({ apiService.submitAuth(map)},{
+            submitdata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
+        },isShowDialog = false)
     }
     fun getuserinfo(vpn: String,slots: String,simcount: String) {
         val map = hashMapOf(
@@ -45,15 +59,20 @@ class AuthModel : BaseViewModel() {
             ,"F9FfkF65u60EyUBta19sf1sT35LncHWhfK" to SettingUtil.isDeviceRooted().toString() ,"ty4KsDDtUaDQyufZqE" to slots ,
             "ZpImjX0pSKJ0oVaRmizPrR0NzNrZyqF2" to simcount,"UmbYQMS8YVrrXhlZD3SiYMCE3maDZ" to "1"
         )
-        getData({ apiService.getuserinfo(map)},{
+        getData2({ apiService.getuserinfo(map)},{
             homebean.value =it
-        },isShowDialog = true)
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
+        },isShowDialog = false)
     }
+
     fun authinfo() {
         val map = hashMapOf("" to ""
         )
         getData({ apiService.authinfo(map)},{
             authinfoData.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
     fun ocr(imageUrl: String, ocrType: String) {

@@ -4,6 +4,7 @@ class MessageEvent internal constructor(status: Int,message: String) {
     companion object {
         const val login: Int = 1
         const val au: Int = 2
+        const val finish: Int = 3
     }
     private var message: String? = null
     private var status: Int? = 0

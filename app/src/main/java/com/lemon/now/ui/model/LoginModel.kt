@@ -1,6 +1,8 @@
 package com.lemon.now.ui.model
 
+import ToastUtils
 import androidx.lifecycle.MutableLiveData
+import com.lemon.now.base.App
 import com.lemon.now.base.etx.databind.StringObservableField
 import com.lemon.now.base.etx.net.apiService
 import com.lemon.now.base.etx.net.getData
@@ -31,6 +33,8 @@ class LoginModel  : BaseViewModel() {
         )
         getData({ apiService.login(map)}, {
             result.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
     fun logout() {
@@ -38,6 +42,8 @@ class LoginModel  : BaseViewModel() {
         )
         getData({ apiService.logout(map)},{
             commonData.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
     fun code(userPhone: String) {
@@ -45,6 +51,8 @@ class LoginModel  : BaseViewModel() {
         )
         getData({ apiService.code(map)},{
             commonData.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 }

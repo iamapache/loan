@@ -15,6 +15,10 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustEvent
+import com.facebook.appevents.AppEventsConstants
+import com.facebook.appevents.AppEventsLogger
 import com.lemon.now.base.activity.BaseActivity
 import com.lemon.now.online.R
 import com.lemon.now.online.databinding.ActivityLoginBinding
@@ -53,7 +57,7 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
             override fun onClick(view: View) {
                 val intent = Intent(this@LoginActivity, WebActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("param1", "value1")
+                intent.putExtra("url", ApiService.SERVER_PRI)
                 startActivity(intent)
             }
 
@@ -70,7 +74,7 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
             override fun onClick(view: View) {
                 val intent = Intent(this@LoginActivity, WebActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("param1", "value1")
+                intent.putExtra("url", ApiService.SERVER_PRI)
                 startActivity(intent)
             }
         }, 51, 65, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -100,6 +104,8 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
             override fun afterTextChanged(s: Editable?) {
                 if (s.toString().isNotEmpty()) {
                     mDatabind.editText3.requestFocus()
+                }else{
+                    mDatabind.editText.requestFocus()
                 }
             }
 
@@ -113,6 +119,8 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
             override fun afterTextChanged(s: Editable?) {
                 if (s.toString().isNotEmpty()) {
                     mDatabind.editText4.requestFocus()
+                }else{
+                    mDatabind.editText2.requestFocus()
                 }
             }
 
@@ -122,7 +130,19 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
+        mDatabind.editText4.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isEmpty()) {
+                    mDatabind.editText3.requestFocus()
+                }
+            }
 
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
     }
 
     inner class ProxyClick {
@@ -132,6 +152,8 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
         }
 
         fun login() {
+            val adjustEvent = AdjustEvent(ApiService.login)
+            Adjust.trackEvent(adjustEvent)
             when {
                 mViewModel.username.get().isEmpty() -> ToastUtils.showShort(this@LoginActivity,"Please enter a 10-digit mobile number")
                 mViewModel.editText.get().isEmpty() -> ToastUtils.showShort(this@LoginActivity,"Please enter a code")
@@ -139,27 +161,42 @@ class LoginActivity : BaseActivity<LoginModel, ActivityLoginBinding>() {
                 mViewModel.editText3.get().isEmpty() -> ToastUtils.showShort(this@LoginActivity,"Please enter a code")
                 mViewModel.editText4.get().isEmpty() -> ToastUtils.showShort(this@LoginActivity,"Please enter a code")
                 !mDatabind.agreeCheckBox.isChecked-> ToastUtils.showShort(this@LoginActivity,"Please agree with our policy to continue")
-                else -> mViewModel.post(
-                    mViewModel.username.get(),
-                    mViewModel.editText.get()+mViewModel.editText2.get()+mViewModel.editText3.get()+mViewModel.editText4.get(),
-                    SettingUtil.isVpnConnected(this@LoginActivity).toString(),SettingUtil.getAvailableSimSlots(this@LoginActivity).toString(),
-                    SettingUtil.getActivatedSimCount(this@LoginActivity).toString()
-                )
+                else -> {
+
+                    mViewModel.post(
+                        mViewModel.username.get(),
+                        mViewModel.editText.get() + mViewModel.editText2.get() + mViewModel.editText3.get() + mViewModel.editText4.get(),
+                        SettingUtil.isVpnConnected(this@LoginActivity).toString(),
+                        SettingUtil.getAvailableSimSlots(this@LoginActivity).toString(),
+                        SettingUtil.getActivatedSimCount(this@LoginActivity).toString()
+                    )
+                }
             }
         }
 
         fun getotp() {
-
+            val adjustEvent = AdjustEvent(ApiService.code)
+            Adjust.trackEvent(adjustEvent)
             when {
                 mViewModel.username.get().isEmpty() -> ToastUtils.showShort(this@LoginActivity,"Please enter a 10-digit mobile number")
-                else -> mViewModel.code(
-                    mViewModel.username.get(),)
+                else -> {
+
+                    mViewModel.code(
+                        mViewModel.username.get(),
+                    )
+                }
             }
         }
 
     }
     override fun createObserver() {
         mViewModel.result.observe(this, Observer {
+            if (it.uhkYxTpQpXP == 1) {
+                val adjustEvent = AdjustEvent(ApiService.register)
+                Adjust.trackEvent(adjustEvent)
+                val logger = AppEventsLogger.newLogger(this)
+                logger.logEvent(AppEventsConstants.EVENT_NAME_COMPLETED_REGISTRATION)
+            }
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
                 var loginToken:   String by SPUtil(ApiService.loginToken, "")
                 loginToken=it.CtEDjA

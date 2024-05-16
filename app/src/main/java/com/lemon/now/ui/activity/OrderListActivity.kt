@@ -58,49 +58,49 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
             status = 0
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(false)
         }
         mViewBind.llpen.setOnClickListener {
             status = 1
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(false)
         }
         mViewBind.lldis.setOnClickListener {
             status = 2
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
         mViewBind.lltobe.setOnClickListener {
             status = 3
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
         mViewBind.llfail.setOnClickListener {
             status = 5
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
         mViewBind.lldepin.setOnClickListener {
             status = 5
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
         mViewBind.llover.setOnClickListener {
             status = 6
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
         mViewBind.llrepaid.setOnClickListener {
             status = 4
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
 //        loadNextPage()
 
@@ -111,32 +111,44 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
         mViewBind.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                val visibleItemCount = layoutManager.childCount
                 val totalItemCount = layoutManager.itemCount
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
 
-                if (!isLoading && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
-                    loadNextPage()
+                if (!recyclerView.canScrollVertically(1) && totalItemCount > 0 && lastVisibleItem >= totalItemCount - 1) {
+                    loadNextPage(false)
                 }
             }
         })
         mViewBind.swipeRefreshLayout.setOnRefreshListener {
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(false)
         }
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            showLoading("loading")
+
+        }, 500)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            dismissLoading()
+
+        }, 2000)
     }
     override fun onRestart() {
         super.onRestart()
-
+        currentPage = 1
+        falg = true
+        loadNextPage(false)
         Handler(Looper.getMainLooper()).postDelayed(Runnable {
-            currentPage = 1
-            falg = true
-            loadNextPage()
+            showLoading("loading")
+
         }, 500)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            dismissLoading()
+
+        }, 2000)
     }
 
-    private fun loadNextPage() {
+    private fun loadNextPage(isShowDialog: Boolean) {
         isLoading = true
         val map = hashMapOf(
             "gechsSbDxMXWr0ebMWvxyyMrfgsU6u4CEs" to currentPage,
@@ -145,14 +157,14 @@ class OrderListActivity : BaseActivity1<OrderViewModel, ActivityOrderlistBinding
         if (status != 0) {
             map.put("N4ZFdMcD64dDJ", status)
         }
-        mViewModel.orderlist(map,false)
+        mViewModel.orderlist(map,isShowDialog)
     }
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             currentPage = 1
             falg = true
-            loadNextPage()
+            loadNextPage(true)
         }
     }
     override fun createObserver() {

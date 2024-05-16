@@ -5,6 +5,8 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
@@ -16,6 +18,7 @@ import androidx.core.content.ContextCompat
 import com.lemon.now.base.activity.BaseActivity1
 import com.lemon.now.online.R
 import com.lemon.now.online.databinding.ActivityPrivacyBinding
+import com.lemon.now.ui.ApiService
 import com.lemon.now.ui.model.HomeViewModel
 
 /**
@@ -26,7 +29,14 @@ import com.lemon.now.ui.model.HomeViewModel
 class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
 
     override fun initView(savedInstanceState: Bundle?) {
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            showLoading("loading")
 
+        }, 100)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            dismissLoading()
+
+        }, 1000)
         val style =
             SpannableStringBuilder("By continuing you agree our Terms & Conditions and Privacy Policy.")
         style.setSpan(
@@ -39,7 +49,7 @@ class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
             override fun onClick(view: View) {
                 val intent = Intent(this@PrivacyActivity, WebActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("param1", "value1")
+                intent.putExtra("url", ApiService.SERVER_PRI)
                 startActivity(intent)
             }
 
@@ -56,7 +66,7 @@ class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
             override fun onClick(view: View) {
                 val intent = Intent(this@PrivacyActivity, WebActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("param1", "value1")
+                intent.putExtra("url", ApiService.SERVER_PRI)
                 startActivity(intent)
             }
         }, 51, 65, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -64,6 +74,8 @@ class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
         mViewBind.agree.movementMethod = LinkMovementMethod.getInstance()
         mViewBind.agree.highlightColor = resources.getColor(android.R.color.transparent)
         mViewBind.agree.text = style
+        mViewBind.wev.loadUrl("about:blank");
+        mViewBind.wev.loadUrl("https://www.lemonapp.net/start.html")
         mViewBind.txrefuse.setOnClickListener {
             finish()
         }
@@ -76,6 +88,7 @@ class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
             } else {
                 if (allPermissionsGranted()) {
                     startActivity(Intent(this@PrivacyActivity, SplashActivity::class.java))
+                    finish()
                 } else {
                     ActivityCompat.requestPermissions(
                         this, arrayOf(
@@ -91,7 +104,6 @@ class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
     companion object {
         private const val SMS_PERMISSION_REQUEST_CODE = 101
         private val REQUEST_WRITE_CONTACTS = 123
-        private const val REQUEST_CODE_READ_EXTERNAL_STORAGE = 100
     }
 
     private fun allPermissionsGranted(): Boolean {
@@ -112,6 +124,7 @@ class PrivacyActivity : BaseActivity1<HomeViewModel, ActivityPrivacyBinding>() {
             SMS_PERMISSION_REQUEST_CODE -> {
                 if (allPermissionsGranted()) {
                     startActivity(Intent(this@PrivacyActivity, SplashActivity::class.java))
+                    finish()
                 } else {
                     finish()
                 }

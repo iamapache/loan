@@ -2,16 +2,23 @@ package com.lemon.now.ui.activity
 
 import ToastUtils
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.media.ExifInterface
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
+import android.view.Gravity
+import android.view.OrientationEventListener
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
@@ -19,6 +26,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustEvent
 import com.amazonaws.auth.BasicSessionCredentials
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver
@@ -27,8 +36,13 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Region
 import com.amazonaws.services.s3.AmazonS3Client
 import com.lemon.now.base.activity.BaseActivity1
+import com.lemon.now.base.etx.util.singleClick
+import com.lemon.now.base.etx.view.CustomDialogFail
+import com.lemon.now.base.etx.view.dismissLoadingExt2
+import com.lemon.now.base.etx.view.showLoadingExt2
 import com.lemon.now.online.R
 import com.lemon.now.online.databinding.ActivityUserfacestepBinding
+import com.lemon.now.ui.ApiService
 import com.lemon.now.ui.model.HomeViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -37,6 +51,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.UUID
+
 
 /**
  *   Lemon Cash
@@ -47,8 +62,9 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
     companion object {
         private const val REQUEST_CODE_PERMISSION_CAMERA = 100
     }
+
     private var imageCapture: ImageCapture? = null
-    var url :String="";
+    var url: String = "";
     var falg: Boolean = false
     override fun initView(savedInstanceState: Bundle?) {
         mViewBind.back.setOnClickListener {
@@ -67,9 +83,11 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         }
 
         mViewBind.takcam.setOnClickListener {
-            mViewBind.takcam.visibility=View.GONE
-            mViewBind.txtop.visibility=View.INVISIBLE
-            mViewBind.llTx.visibility=View.VISIBLE
+            mViewBind.takcam.visibility = View.GONE
+            mViewBind.txtop.visibility = View.INVISIBLE
+            mViewBind.llTx.visibility = View.VISIBLE
+            val adjustEvent = AdjustEvent(ApiService.face)
+            Adjust.trackEvent(adjustEvent)
             takePhoto()
         }
 
@@ -77,19 +95,45 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
             mViewBind.img.setImageBitmap(null)
             mViewBind.img.visibility = View.GONE
             mViewBind.previewView.visibility = View.VISIBLE
-            mViewBind.takcam.visibility=View.VISIBLE
-            mViewBind.txtop.visibility=View.INVISIBLE
-            mViewBind.llTx.visibility=View.GONE
+            mViewBind.takcam.visibility = View.VISIBLE
+            mViewBind.txtop.visibility = View.INVISIBLE
+            mViewBind.llTx.visibility = View.GONE
             falg = false
 
             val file = File(url)
             val deleted = file.delete()
-            url=""
+            url = ""
         }
-        mViewBind.Submit.setOnClickListener {
-            if (falg&&!url.isEmpty()) {
-                mViewModel.aws()
+        mViewBind.Submit.singleClick {
+            if (falg && !url.isEmpty()) {
+                showLoadingExt2("loading")
+                mViewModel.aws2()
             }
+        }
+        MyOrientationEventListener(this)
+    }
+
+    inner class MyOrientationEventListener(context: Context?) :
+        OrientationEventListener(context) {
+        override fun onOrientationChanged(orientation: Int) {
+            if (orientation != ORIENTATION_UNKNOWN) {
+                mDeviceOrientation = normalize(orientation)
+            }
+        }
+
+        private fun normalize(orientation: Int): Int {
+            if (orientation > 315 || orientation <= 45) {
+                return 0
+            }
+            if (orientation > 45 && orientation <= 135) {
+                return 90
+            }
+            if (orientation <= 225) {
+                return 180
+            }
+            return if (orientation > 225 && orientation <= 315) {
+                270
+            } else 0
         }
     }
 
@@ -110,41 +154,48 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         if (!oldFolder.exists()) {
             photoFile.mkdirs()
         }
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(oldFolder).build()
-            imageCapture.takePicture(
-                outputOptions,
-                ContextCompat.getMainExecutor(this),
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                        var bitmap: Bitmap? =null
+        val metadata = ImageCapture.Metadata().apply {
+            isReversedVertical = false
+        }
+        val outputOptions =
+            ImageCapture.OutputFileOptions.Builder(oldFolder).setMetadata(metadata).build()
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(this),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    var bitmap =
+                        BitmapFactory.decodeFile(oldFolder.absolutePath)
 
-                            bitmap =
-                                BitmapFactory.decodeFile(oldFolder.absolutePath)
-                        val compressedImageData = compressBitmapToByteArray(bitmap!!, 200 * 1024)
-                        val newFolder = File(photoFile, "${UUID.randomUUID()}.jpg")
-                        saveBitmapToFile(compressedImageData, newFolder)
-                        oldFolder.delete()
+                    val compressedImageData =
+                        compressBitmapToByteArray(bitmap!!, 300 * 1024, oldFolder.absolutePath)
+                    val newFolder = File(photoFile, "${UUID.randomUUID()}.jpg")
+                    saveBitmapToFile(compressedImageData, newFolder)
+//
+                    oldFolder.delete()
+                    var bitmap2 =
+                        BitmapFactory.decodeFile(newFolder.absolutePath)
+                    mViewBind.img.setImageBitmap(bitmap2)
 
-                        mViewBind.img.visibility = View.VISIBLE
-                        mViewBind.previewView.visibility = View.GONE
-                        mViewBind.takcam.setBackgroundResource(R.mipmap.takok)
-                        falg = true
-                        val bitmap2 = BitmapFactory.decodeFile(newFolder.absolutePath)
-                        mViewBind.img.setImageBitmap(bitmap2)
-                        url =newFolder.getAbsolutePath()
+                    mViewBind.img.visibility = View.VISIBLE
+                    mViewBind.previewView.visibility = View.GONE
+                    mViewBind.takcam.setBackgroundResource(R.mipmap.takok)
+                    falg = true
+                    url = newFolder.getAbsolutePath()
 
 //                        Toast.makeText(this@CameraActivity, "sucess: $savedUri", Toast.LENGTH_SHORT).show()
-                    }
+                }
 
-                    override fun onError(exc: ImageCaptureException) {
-                        Toast.makeText(
-                            this@UserFaceActivity,
-                            "fail: ${exc.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                })
+                override fun onError(exc: ImageCaptureException) {
+                    Toast.makeText(
+                        this@UserFaceActivity,
+                        "fail: ${exc.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
+
     private fun allPermissionsGranted(): Boolean {
         return (ContextCompat.checkSelfPermission(
             this,
@@ -157,37 +208,101 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder().build()
+            val preview =
+                Preview.Builder().setTargetRotation(this.windowManager.defaultDisplay.rotation)
+                    .build()
+
             preview.setSurfaceProvider(mViewBind.previewView.surfaceProvider)
-
-            imageCapture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetRotation(mViewBind.previewView.display.rotation).setTargetResolution(Size(500,500)).build()
-
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .setTargetRotation(this.windowManager.defaultDisplay.rotation)
+                .setOutputImageRotationEnabled(true)
+                .build()
+            imageCapture =
+                ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                    .setTargetResolution(Size(250, 250)).build()
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageCapture,
+                    imageAnalyzer
+                )
             } catch (exc: Exception) {
                 Toast.makeText(this, "fail: ${exc.message}", Toast.LENGTH_SHORT).show()
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
-    fun compressBitmapToByteArray(bitmap: Bitmap, maxSize: Int): ByteArray {
-        val outputStream = ByteArrayOutputStream()
 
-        var quality = 100
+    var mDeviceOrientation: Int = 0
+    fun getJpegOrientation(naturalJpegOrientation: Int, deviceOrientation: Int): Int {
+        return (naturalJpegOrientation + deviceOrientation) % 360
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degree: Int): Bitmap {
         val matrix = Matrix()
-        matrix.postRotate(270F)
-        val rotatedImage = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        matrix.postRotate(degree.toFloat())
+//        matrix.postScale(-1F, 1F);
+        val rotatedBitmap =
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        bitmap.recycle()
+        return rotatedBitmap
+    }
+
+    fun compressBitmapToByteArray(bitmap: Bitmap, maxSize: Int, imagePath: String): ByteArray {
+
+        val outputStream = ByteArrayOutputStream()
+        val exifInterface = ExifInterface(imagePath)
+        val orientation = exifInterface.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.setScale(-1f, 1f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.setRotate(180f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.setScale(1f, -1f)
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.setRotate(90f)
+                matrix.postScale(-1f, 1f)
+            }
+
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.setRotate(90f)
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.setRotate(-90f)
+                matrix.postScale(-1f, 1f)
+            }
+
+            ExifInterface.ORIENTATION_ROTATE_270 -> {
+                matrix.setRotate(-90f)
+                matrix.postScale(-1f, 1f)
+            }
+
+            ExifInterface.ORIENTATION_UNDEFINED -> {
+                matrix.postScale(-1f, 1f)
+            }
+        }
+        Log.d(
+            "InstalledApp",
+            "ID: $orientation person: "
+        )
+        var quality = 100
+        val rotatedImage =
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
         rotatedImage.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
         while (outputStream.toByteArray().size > maxSize && quality > 0) {
             outputStream.reset()
-            quality -= 10
+            quality -= 5
             rotatedImage.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
         }
         return outputStream.toByteArray()
     }
+
+
     fun saveBitmapToFile(imageData: ByteArray, outputFile: File) {
         try {
             val fileOutputStream = FileOutputStream(outputFile)
@@ -197,6 +312,7 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
             e.printStackTrace()
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -206,7 +322,11 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
         when (requestCode) {
             REQUEST_CODE_PERMISSION_CAMERA -> {
                 if (allPermissionsGranted()) {
-                    Toast.makeText(this, " ${intent.getStringExtra("phototext")}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        " ${intent.getStringExtra("phototext")}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     startCamera()
                 } else {
                     finish()
@@ -258,17 +378,37 @@ class UserFaceActivity : BaseActivity1<HomeViewModel, ActivityUserfacestepBindin
 
                     override fun onError(id: Int, e: Exception) {
                         Log.e("S3", "error", e)
+                        dismissLoading()
+                        ToastUtils.showShort(this@UserFaceActivity, e?.message ?: "timeout")
+
                     }
                 })
             }
         })
 
         mViewModel.userFaceStepdata.observe(this, Observer {
+            dismissLoadingExt2()
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
                 setResult(RESULT_OK)
                 finish()
-            }else {
+            } else {
                 ToastUtils.showShort(this@UserFaceActivity, it.vWCgp64OkxPVoGqics)
+                val dialog = CustomDialogFail(this@UserFaceActivity)
+                dialog.setConfirmCallback {
+                }
+                dialog.setCancelCallback {
+
+                }
+                dialog.setCancelable(false)
+                dialog.show()
+                dialog.setcontent("Upload failed, please try again.")
+                val dialogWindow: Window = dialog.window!!
+                val m: WindowManager = getWindowManager()
+                val d = m.defaultDisplay
+                val p = dialogWindow.attributes
+                p.width = (d.width * 0.95).toInt()
+                p.gravity = Gravity.CENTER
+                dialogWindow.attributes = p
             }
         })
     }

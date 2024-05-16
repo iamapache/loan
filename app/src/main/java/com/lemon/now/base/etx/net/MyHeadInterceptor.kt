@@ -21,8 +21,8 @@ class MyHeadInterceptor : Interceptor {
         builder.addHeader("token", loginToken).build()
         var channel: String by SPUtil(ApiService.channel, "Other")
         var googleAdid:   String by SPUtil("googleadid", UUID.randomUUID().toString())
-        var deviceInfo = DeviceInfo("", BuildConfig.VERSION_NAME.toString(), BuildConfig.APPLICATION_ID,Build.BRAND,
-            channel,Build.MODEL,googleAdid,"","Android",Build.VERSION.RELEASE + "")
+        var deviceInfo = DeviceInfo(UUID.randomUUID().toString(), BuildConfig.VERSION_NAME.toString(), BuildConfig.APPLICATION_ID,Build.BRAND,
+            channel,Build.MODEL,googleAdid,"","android",Build.VERSION.RELEASE + "")
         builder.addHeader("deviceInfo", Gson().toJson(deviceInfo)).build()
         return chain.proceed(builder.build())
     }

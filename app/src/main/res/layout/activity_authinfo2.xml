@@ -23,7 +23,7 @@
 
             <LinearLayout
                 android:id="@+id/back"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -112,7 +112,7 @@
                             android:layout_centerInParent="true"
                             android:layout_marginLeft="10dp"
                             android:text="₹ 0"
-                            android:textColor="@color/white"
+                            android:textColor="#ff333333"
                             android:textSize="18sp" />
 
                     </RelativeLayout>

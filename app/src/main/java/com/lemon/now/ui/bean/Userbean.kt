@@ -26,3 +26,10 @@ data class Userbean (
     var backimg: String="",
     var cardImg: String=""
 ): Parcelable
+
+data class Contactbean (
+    var contactName: String="",
+    var contactPhone: String=""
+    ,
+    var contactRelation: String=""
+)

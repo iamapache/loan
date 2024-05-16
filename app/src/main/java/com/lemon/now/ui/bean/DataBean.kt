@@ -1,5 +1,8 @@
 package com.lemon.now.ui.bean
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 /**
  *   Lemon Cash
  *  DataBean.java
@@ -67,7 +70,7 @@ data class ORCBean(
 data class LoginBean(
     val CtEDjA: String,
     val rZ81DSU7WU4hny4ukGHljvjO41bfB: Int,
-    val uhkYxTpQpXP: Int,
+    val uhkYxTpQpXP: Int?,
     val vWCgp64OkxPVoGqics: String
 )
 data class AWSBean(
@@ -105,7 +108,7 @@ data class HomeBean(
     val rZ81DSU7WU4hny4ukGHljvjO41bfB: Int,
     val vWCgp64OkxPVoGqics: String
 )
-
+@Parcelize
 data class Qbnsde5LgABnpY9IpFTFXkgR3l8(
     val Ei5rFw3ggCfFFxvogcCvdtX: Int,
     val HPQKWiwz42QnEFJJ8kFrx: Int,
@@ -118,7 +121,7 @@ data class Qbnsde5LgABnpY9IpFTFXkgR3l8(
     val vWdgZA58vY2J8RkbYUJXiCV6aFytmxz: String,
     val wCQXjLl5RSFnUxwYCfTN8WztD1ZrD3Ut: Int,
     val zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV: String
-)
+): Parcelable
 
 data class PruductBean(
     val o2Hvk1wvAGN: List<O2Hvk1wvAGN>,

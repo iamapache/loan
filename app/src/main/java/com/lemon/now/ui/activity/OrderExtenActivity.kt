@@ -3,8 +3,9 @@ package com.lemon.now.ui.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.view.Gravity
+import android.view.Window
+import android.view.WindowManager
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.lemon.now.base.activity.BaseActivity1
@@ -44,6 +45,13 @@ class OrderExtenActivity : BaseActivity1<OrderViewModel, ActivityOrderextenBindi
             dialog.show()
             dialog.setTitle("TIPS")
             dialog.setcontent("By paying a nominal extension fee, you can settle the entire bill at a later time.")
+            val dialogWindow: Window = dialog.window!!
+            val m: WindowManager = getWindowManager()
+            val d = m.defaultDisplay
+            val p = dialogWindow.attributes
+            p.width = (d.width * 0.95).toInt()
+            p.gravity = Gravity.CENTER
+            dialogWindow.attributes = p
 
         }
         val map = hashMapOf(
@@ -53,14 +61,10 @@ class OrderExtenActivity : BaseActivity1<OrderViewModel, ActivityOrderextenBindi
     }
     override fun onRestart() {
         super.onRestart()
-        Handler(Looper.getMainLooper()).postDelayed(Runnable {
-            var bean = intent.getParcelableExtra<M7CdaEiz0WPh1Cs3iyzkg6Od>("bean")
-            val map = hashMapOf(
-                "sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t" to bean?.sCVB4OFAaUm0Ba1V5nsjRGOuGvHSS8t.toString()
-            )
-            mViewModel.extendetail(map)
-        }, 1000)
+
+        finish()
     }
+
     override fun createObserver() {
 
         mViewModel.payresultdata.observe(this, Observer {
@@ -85,7 +89,7 @@ class OrderExtenActivity : BaseActivity1<OrderViewModel, ActivityOrderextenBindi
                 mViewBind.pfdroDCductName.text =  bean?.zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV
 
                 mViewBind.amount.text = "₹ " +  bean?.lKKVSauI0hrmQmhzt6A.toString()
-                mViewBind.date.text =  bean?.JQf1oh1cEBZVVL5yUx.toString()+" days"
+                mViewBind.date.text =  bean?.JQf1oh1cEBZVVL5yUx.toString()+" Days"
 
                 mViewBind.receivedamount.text =bean?.IPpbpFEJ5.toString()
                 mViewBind.receivedate.text =   "₹ " +  bean?.Ei5rFw3ggCfFFxvogcCvdtX.toString()

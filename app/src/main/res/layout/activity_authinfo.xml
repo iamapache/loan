@@ -23,7 +23,7 @@
 
             <LinearLayout
                 android:id="@+id/back"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -338,8 +338,8 @@
                         android:layout_weight="1"
                         android:background="@null"
                         android:hint="IFSC Code"
-                        android:text="asdf0123456"
-                        android:inputType="numberDecimal"
+                        android:text=""
+                        android:inputType="text"
                         android:lines="1"
                         android:maxLength="11"
                         android:paddingLeft="12dp"

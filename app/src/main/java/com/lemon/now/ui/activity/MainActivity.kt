@@ -4,6 +4,9 @@ import SPUtil
 import ToastUtils
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
+import android.view.Window
+import android.view.WindowManager
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.lemon.now.base.activity.BaseActivity1
@@ -83,7 +86,7 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
         if (messageEvent.getStatus() == MessageEvent.login) {
             getHomeData()
         } else if (messageEvent.getStatus() == MessageEvent.au) {
-            mViewModel.getuserinfo(SettingUtil.isVpnConnected(this@MainActivity).toString(),SettingUtil.getAvailableSimSlots(this@MainActivity).toString(),
+            mViewModel.getuserinfo(true,SettingUtil.isVpnConnected(this@MainActivity).toString(),SettingUtil.getAvailableSimSlots(this@MainActivity).toString(),
                 SettingUtil.getActivatedSimCount(this@MainActivity).toString())
         }
     }
@@ -93,7 +96,7 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
         if (loginToken.isNullOrEmpty()) {
             mViewModel.homelist()
         } else {
-            mViewModel.getuserinfo(
+            mViewModel.getuserinfo(true,
                 SettingUtil.isVpnConnected(this@MainActivity).toString(),
                 SettingUtil.getAvailableSimSlots(this@MainActivity).toString(),
                 SettingUtil.getActivatedSimCount(this@MainActivity).toString()
@@ -163,10 +166,16 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
                     dialog.setcontent(it.STfcvbTWCpQuwrJ20nwGJ)
                     dialog.setimg(it.Q7YKhpm77TSWYpeHBXYFn1feV)
                     dialog.setloannotext(it.jvytkVyzR5Qe9Y8K31jmzxdUZpImQJ)
+                    val dialogWindow: Window = dialog.window!!
+                    val m: WindowManager = getWindowManager()
+                    val d = m.defaultDisplay
+                    val p = dialogWindow.attributes
+                    p.width = (d.width * 0.95).toInt()
+                    p.gravity = Gravity.CENTER
+                    dialogWindow.attributes = p
                 }
                 if (it.mKDa0r8qOCzrAe6Pj == 1) {
-                    val intent = Intent(this@MainActivity, AuthenticationActivity::class.java)
-                    startActivity(intent)
+
                     mViewBind.llBg.setBackgroundResource(R.mipmap.homebg)
                     mViewBind.hometop.setBackgroundResource(R.mipmap.hometop)
 

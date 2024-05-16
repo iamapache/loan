@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Size
 import android.view.View
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
@@ -91,7 +92,7 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
             val preview = Preview.Builder().build()
             preview.setSurfaceProvider(mViewBind.previewView.surfaceProvider)
 
-            imageCapture = ImageCapture.Builder().build()
+            imageCapture = ImageCapture.Builder().setTargetResolution(Size(800,500)).build()
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -131,7 +132,8 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
 
                         var   bitmap =
                                 BitmapFactory.decodeFile(oldFolder.absolutePath)
-                        val compressedImageData = compressBitmapToByteArray(bitmap!!, 200 * 1024)
+                        mViewBind.img.setImageBitmap(bitmap)
+                        val compressedImageData = compressBitmapToByteArray(bitmap!!, 300 * 1024)
                         val newFolder = File(photoFile, "${UUID.randomUUID()}.jpg")
                         saveBitmapToFile(compressedImageData, newFolder)
                         oldFolder.delete()
@@ -140,8 +142,7 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
                         mViewBind.previewView.visibility = View.GONE
                         mViewBind.takcam.setBackgroundResource(R.mipmap.takok)
                         falg = true
-                        val bitmap2 = BitmapFactory.decodeFile(newFolder.absolutePath)
-                        mViewBind.img.setImageBitmap(bitmap2)
+//                        val bitmap2 = BitmapFactory.decodeFile(newFolder.absolutePath)
                         url =newFolder.getAbsolutePath()
                     }
 
@@ -159,10 +160,10 @@ class CameraActivity : BaseActivity1<BaseViewModel, ActivityCameraBinding>() {
     fun compressBitmapToByteArray(bitmap: Bitmap, maxSize: Int): ByteArray {
         val outputStream = ByteArrayOutputStream()
         var quality = 100
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
         while (outputStream.toByteArray().size > maxSize && quality > 0) {
             outputStream.reset()
-            quality -= 10
+            quality -= 5
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
         }
         return outputStream.toByteArray()

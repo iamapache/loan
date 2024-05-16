@@ -3,6 +3,9 @@ package com.lemon.now.ui.activity
 import ToastUtils
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
+import android.view.Window
+import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Observer
@@ -96,6 +99,13 @@ class BankInfoActivity : BaseActivity1<AuthModel, ActivityBankinfoBinding>() {
                 dialog.show()
                 dialog.setTitle("TIPS")
                 dialog.setcontent("Please upload a selfie photo before continuing.")
+                val dialogWindow: Window = dialog.window!!
+                val m: WindowManager = getWindowManager()
+                val d = m.defaultDisplay
+                val p = dialogWindow.attributes
+                p.width = (d.width * 0.95).toInt()
+                p.gravity = Gravity.CENTER
+                dialogWindow.attributes = p
 
 
             } else {
@@ -108,6 +118,7 @@ class BankInfoActivity : BaseActivity1<AuthModel, ActivityBankinfoBinding>() {
                 if (it.Qbnsde5LgABnpY9IpFTFXkgR3l8!=null){
                     val intent = Intent(this@BankInfoActivity, OrderActivity::class.java)
                     intent.putExtra("id", it.Qbnsde5LgABnpY9IpFTFXkgR3l8.nJNb2VY6)
+                    intent.putExtra("bean", it.Qbnsde5LgABnpY9IpFTFXkgR3l8)
                     startActivity(intent)
 
                 }else{

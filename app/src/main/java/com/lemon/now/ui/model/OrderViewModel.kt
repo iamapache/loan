@@ -1,8 +1,11 @@
 package com.lemon.now.ui.model
 
+import ToastUtils
 import androidx.lifecycle.MutableLiveData
+import com.lemon.now.base.App
 import com.lemon.now.base.etx.net.apiService
 import com.lemon.now.base.etx.net.getData
+import com.lemon.now.base.etx.net.getData2
 import com.lemon.now.base.viewmodel.BaseViewModel
 import com.lemon.now.ui.bean.AWSBean
 import com.lemon.now.ui.bean.CommonData
@@ -31,6 +34,8 @@ class OrderViewModel : BaseViewModel() {
     fun orderlist (map: HashMap<String, Int>,isShowDialog:Boolean) {
         getData({ apiService.orderlist(map)},{
             orderdata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = isShowDialog)
     }
 
@@ -38,18 +43,32 @@ class OrderViewModel : BaseViewModel() {
     fun orderdetail (map: HashMap<String, String>) {
         getData({ apiService.orderdetail(map)},{
             orderdetaildata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
+    }
+
+    fun orderdetail2 (isShowDialog: Boolean,map: HashMap<String, String>) {
+        getData({ apiService.orderdetail(map)},{
+            orderdetaildata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
+        },isShowDialog = isShowDialog)
     }
 
     fun extendetail (map: HashMap<String, String>) {
         getData({ apiService.extendetail(map)},{
             extendata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 
     fun repay (map: HashMap<String, String>) {
         getData({ apiService.repay(map)},{
             payresultdata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 
@@ -60,6 +79,8 @@ class OrderViewModel : BaseViewModel() {
         )
         getData({ apiService.aws(map)},{
             awsData.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 
@@ -69,12 +90,16 @@ class OrderViewModel : BaseViewModel() {
         )
         getData({ apiService.fblist(map)},{
             fbdata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 
     fun fbsave (map: HashMap<String, String>) {
         getData({ apiService.fbsave(map)},{
             commondata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 
@@ -87,6 +112,8 @@ class OrderViewModel : BaseViewModel() {
         )
         getData({ apiService.checkorderstatus(map)},{
             orderstatusdata.value =it
+        },{
+            ToastUtils.showShort(App.instance,it.errorMsg)
         },isShowDialog = true)
     }
 }

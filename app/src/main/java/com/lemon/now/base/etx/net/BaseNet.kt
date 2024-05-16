@@ -28,6 +28,29 @@ fun <T> BaseViewModel.getData(
             loadingChange.dismissDialog.postValue(false)
             it.message?.loge()
             it.printStackTrace()
+            error(ExceptionHandle.handleException(it))
+        }
+    }
+}
+
+fun <T> BaseViewModel.getData2(
+    block: suspend () -> T,
+    success: (T) -> Unit,
+    error: (AppException) -> Unit = {},
+    isShowDialog: Boolean = false,
+    loadingMessage: String = "loading..."
+): Job {
+    if (isShowDialog) loadingChange.showDialog.postValue(loadingMessage)
+    return viewModelScope.launch {
+        runCatching {
+            block()
+        }.onSuccess {
+            success(it)
+        }.onFailure {
+            loadingChange.dismissDialog.postValue(false)
+            it.message?.loge()
+            it.printStackTrace()
+            error(ExceptionHandle.handleException(it))
         }
     }
 }

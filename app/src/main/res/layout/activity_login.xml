@@ -38,18 +38,23 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
+        <LinearLayout
             android:id="@+id/finish"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:onClick="@{()->click.gofinish()}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+        <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginLeft="17dp"
             android:layout_marginTop="17dp"
             android:background="@mipmap/icon_back"
-            android:onClick="@{()->click.gofinish()}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            />
+        </LinearLayout>
         <ImageView
             android:id="@+id/txt_b"
             android:layout_width="200dp"
@@ -101,11 +106,17 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:background="@mipmap/yindu" />
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+91"
+                    android:layout_marginLeft="8dp"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="19dp" />
                 <EditText
                     android:layout_width="140dp"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginLeft="5dp"
                     android:layout_weight="1"
                     android:background="@null"
                     android:hint="Mobile number"

@@ -11,11 +11,18 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustEvent
 import com.lemon.now.base.activity.BaseActivity
 import com.lemon.now.online.R
 import com.lemon.now.online.databinding.ActivityAuthinfo2Binding
+import com.lemon.now.ui.ApiService
 import com.lemon.now.ui.bean.Userbean
 import com.lemon.now.ui.model.AuthModel
+import com.lemon.now.ui.model.MessageEvent
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import kotlin.math.roundToInt
 
 /**
@@ -30,7 +37,13 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
         }
 
         mViewModel.authinfo()
-
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
     }
 
     private fun updateTextViewPosition(progress: Int) {
@@ -41,7 +54,12 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
         layoutParams.leftMargin = marginLeft
         mDatabind.textViewProgress.layoutParams = layoutParams
     }
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun Event(messageEvent: MessageEvent) {
+        if (messageEvent.getStatus() == MessageEvent.finish) {
+            finish()
+        }
+    }
     private var contactNum: Int = 2
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -49,10 +67,26 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
 
         mViewModel.authinfoData.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
+
+                mDatabind.education.setText( it.RgIwwGuM6dYSN4t23O0GPn8zst92eIaqZRwC.toString())
+                mDatabind.marriage.setText( it.xfURXA8BaCLrizxNEQwguL4cPlJN7.toString())
+                mDatabind.monthly.text = it.gclNe1gaPMSU0WGkMck.toString()
+                mDatabind.work.text = it.zswPxseFJ4wfFRWEW.toString()
+                mDatabind.industry.text = it.AYKOEPY4e0zKPzfrsKvZNxN2o.toString()
+                mDatabind.whatsapp.setText( it.vJ66bDlFvxStgaxLp.toString())
+                mDatabind.mail.setText( it.ZheSOnZb6V2S1InXqk69.toString())
+                mDatabind.facebook.setText( it.jtwU2xNJjC.toString())
+                mDatabind.textViewProgress.text = "₹ " + it.RUagIHMvlGBEDR.toString()
+
+                if(!it.RUagIHMvlGBEDR.isNullOrEmpty()){
+                    mDatabind.progressBar.progress= it.RUagIHMvlGBEDR.toInt()
+                }
+
+
                 contactNum = it.PLnVmUR
                 mDatabind.progressBar.progress = (it.sxaJHj03AOxHpo2O47qKyr / it.SvcYq6jLm12) / 100
                 mDatabind.progressBar.max = it.SvcYq6jLm12
-                mDatabind.progressBar.min = 0
+                mDatabind.progressBar.min = it.sxaJHj03AOxHpo2O47qKyr
                 mDatabind.progressBar.setOnSeekBarChangeListener(object :
                     SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(
@@ -69,7 +103,7 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
 
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
                 })
-                mDatabind.priceMax.text = it.SvcYq6jLm12.toString()
+                mDatabind.priceMax.text = "₹ " + it.SvcYq6jLm12.toString()
 
                 mDatabind.mail.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(
@@ -108,7 +142,29 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
                     }
                     popupMenu.show()
                 }
+                mDatabind.education.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        if (s.toString().isNotEmpty()) {
+                            val popupMenu = PopupMenu(this@AuthInfoDetailActivity, mDatabind.llMarriage)
+                            val customData = it.DocSwVPKpef7F0Qbwtp6YmPjAoTIZBsJiF
+                            for (i in customData.indices) {
+                                popupMenu.menu.add(Menu.NONE, Menu.NONE, i, customData[i])
+                            }
+                            popupMenu.setOnMenuItemClickListener { menuItem ->
+                                val selectedItem = customData[menuItem.order]
+                                mDatabind.marriage.text = selectedItem
+                                true
+                            }
+                            popupMenu.show()
+                        }
+                    }
 
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    }
+                })
                 mDatabind.llMarriage.setOnClickListener { view ->
                     val popupMenu = PopupMenu(this, view)
                     val customData = it.DocSwVPKpef7F0Qbwtp6YmPjAoTIZBsJiF
@@ -122,7 +178,29 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
                     }
                     popupMenu.show()
                 }
+                mDatabind.marriage.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        if (s.toString().isNotEmpty()) {
+                            val popupMenu = PopupMenu(this@AuthInfoDetailActivity, mDatabind.llMonthly)
+                            val customData = it.nVMbOkJFW01L2ujozEHSQ6
+                            for (i in customData.indices) {
+                                popupMenu.menu.add(Menu.NONE, Menu.NONE, i, customData[i])
+                            }
+                            popupMenu.setOnMenuItemClickListener { menuItem ->
+                                val selectedItem = customData[menuItem.order]
+                                mDatabind.monthly.text = selectedItem
+                                true
+                            }
+                            popupMenu.show()
+                        }
+                    }
 
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    }
+                })
 
                 mDatabind.llMonthly.setOnClickListener { view ->
                     val popupMenu = PopupMenu(this, view)
@@ -137,19 +215,30 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
                     }
                     popupMenu.show()
                 }
-                mDatabind.llIndustry.setOnClickListener { view ->
-                    val popupMenu = PopupMenu(this, view)
-                    val customData = it.nXN5n9vv
-                    for (i in customData.indices) {
-                        popupMenu.menu.add(Menu.NONE, Menu.NONE, i, customData[i])
+
+                mDatabind.monthly.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        if (s.toString().isNotEmpty()) {
+                            val popupMenu = PopupMenu(this@AuthInfoDetailActivity, mDatabind.llWork)
+                            val customData = it.KfJ3zvyekom0HCZ0rH
+                            for (i in customData.indices) {
+                                popupMenu.menu.add(Menu.NONE, Menu.NONE, i, customData[i])
+                            }
+                            popupMenu.setOnMenuItemClickListener { menuItem ->
+                                val selectedItem = customData[menuItem.order]
+                                mDatabind.work.text = selectedItem
+                                true
+                            }
+                            popupMenu.show()
+                        }
                     }
-                    popupMenu.setOnMenuItemClickListener { menuItem ->
-                        val selectedItem = customData[menuItem.order]
-                        mDatabind.industry.text = selectedItem
-                        true
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                     }
-                    popupMenu.show()
-                }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    }
+                })
 
                 mDatabind.llWork.setOnClickListener { view ->
                     val popupMenu = PopupMenu(this, view)
@@ -164,8 +253,49 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
                     }
                     popupMenu.show()
                 }
+                mDatabind.work.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        if (s.toString().isNotEmpty()) {
+                            val popupMenu = PopupMenu(this@AuthInfoDetailActivity, mDatabind.llIndustry)
+                            val customData = it.nXN5n9vv
+                            for (i in customData.indices) {
+                                popupMenu.menu.add(Menu.NONE, Menu.NONE, i, customData[i])
+                            }
+                            popupMenu.setOnMenuItemClickListener { menuItem ->
+                                val selectedItem = customData[menuItem.order]
+                                mDatabind.industry.text = selectedItem
+                                true
+                            }
+                            popupMenu.show()
+                        }
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    }
+                })
+
+                mDatabind.llIndustry.setOnClickListener { view ->
+                    val popupMenu = PopupMenu(this, view)
+                    val customData = it.nXN5n9vv
+                    for (i in customData.indices) {
+                        popupMenu.menu.add(Menu.NONE, Menu.NONE, i, customData[i])
+                    }
+                    popupMenu.setOnMenuItemClickListener { menuItem ->
+                        val selectedItem = customData[menuItem.order]
+                        mDatabind.industry.text = selectedItem
+                        true
+                    }
+                    popupMenu.show()
+                }
+
+
 
                 mDatabind.next.setOnClickListener {
+                    val adjustEvent = AdjustEvent(ApiService.step3)
+                    Adjust.trackEvent(adjustEvent)
                     if (mDatabind.education.text.toString()
                             .isNotEmpty() && mDatabind.marriage.text.toString()
                             .isNotEmpty()

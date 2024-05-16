@@ -3,27 +3,33 @@ package com.lemon.now.util
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.KeyguardManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.Signature
+import android.content.res.Configuration
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
+import android.os.BatteryManager
 import android.os.Build
+import android.os.Debug
 import android.os.Environment
 import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
-import android.telephony.SignalStrength
 import android.telephony.TelephonyManager
+import android.text.format.Formatter
 import android.util.Base64
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import com.lemon.now.online.BuildConfig
 import com.lemon.now.ui.activity.AuthenticationActivity
 import com.lemon.now.ui.activity.OrderActivity
@@ -58,6 +64,7 @@ object SettingUtil {
             2 -> {
                 val intent = Intent(context, OrderActivity::class.java)
                 intent.putExtra("id", productdd)
+                intent.putExtra("bean", it.Qbnsde5LgABnpY9IpFTFXkgR3l8)
                 context.startActivity(intent)
             }
 
@@ -125,15 +132,17 @@ object SettingUtil {
                     intent.putExtra("type", 5)
                 } else if (it.a2kevgH5EWY9waHNv76F6xKXEwY == 0) {
                     if (it.EeUgjkb0udXKtKsOyWNChxEzmrn4ZIK46o?.toInt() ?: 0 > 0) {
+
+
+                        intent.putExtra("type", 55)
+                        intent.putExtra("title", "Denied")
+                    } else {
                         intent.putExtra(
                             "titlecontent",
                             "Hello, you are now ready to proceed with this application."
                         )
                         intent.putExtra("type", 555)
                         intent.putExtra("title", "Detail")
-                    } else {
-                        intent.putExtra("type", 55)
-                        intent.putExtra("title", "Denied")
                     }
                 }
                 intent.putExtra("bean", it)
@@ -177,7 +186,25 @@ object SettingUtil {
             }
         }
     }
-    fun isEmulator(): Boolean {
+    @SuppressLint("SuspiciousIndentation")
+    fun isEmulator(): String {
+     var boo=   (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
+                Build.FINGERPRINT.startsWith("generic") ||
+                Build.FINGERPRINT.startsWith("unknown") ||
+                Build.HARDWARE.contains("goldfish") ||
+                Build.HARDWARE.contains("ranchu") ||
+                Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.contains("Emulator") ||
+                Build.MODEL.contains("Android SDK built for x86")
+        if (boo){
+            return "1"
+        }else{
+            return "0"
+        }
+        return "0"
+    }
+
+    fun isEmulator2(): Boolean {
         return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
                 Build.FINGERPRINT.startsWith("generic") ||
                 Build.FINGERPRINT.startsWith("unknown") ||
@@ -188,8 +215,43 @@ object SettingUtil {
                 Build.MODEL.contains("Android SDK built for x86")
     }
     fun isDeviceRooted2(): Boolean {
-        val buildTags = Build.TAGS ?: return false
-        return buildTags.contains("test-keys") || buildTags.contains("release-keys")
+        val buildTags = Build.TAGS
+        if (buildTags != null && buildTags.contains("test-keys")) {
+            return true
+        }
+
+        var file: File? = null
+
+        val paths = arrayOf(
+            "/system/bin/",
+            "/system/xbin/",
+            "/system/sbin/",
+            "/sbin/",
+            "/vendor/bin/",
+            "/su/bin/"
+        )
+        try {
+            for (path in paths) {
+                file = File(path + "su")
+                if (file.exists() && file.canExecute()) {
+                    return true
+                }
+            }
+        } catch (x: java.lang.Exception) {
+            x.printStackTrace()
+        }
+        var file2: File? = null
+        try {
+            for (path in paths) {
+                file2 =  File(path + "busybox");
+                if (file2.exists() && file2.canExecute()) {
+                    return true
+                }
+            }
+        } catch (x: java.lang.Exception) {
+            x.printStackTrace()
+        }
+        return false
     }
     fun String.base64(): String {
         try {
@@ -317,7 +379,65 @@ object SettingUtil {
         }
         return 0
     }
+    fun isUsingProxy(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val network = connectivityManager.activeNetwork
+            val proxyInfo = connectivityManager.getLinkProperties(network)
+            return proxyInfo?.isPrivateDnsActive() != null
+        } else {
+            val networkInfo = connectivityManager.activeNetworkInfo
+            return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_MOBILE // 假设使用移动网络时使用了代理
+        }
+    }
 
+     fun isNetworkAvailable(context: Context): Boolean {
+          var isNetworkAvailable: Boolean = false
+         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+         val networkRequest = NetworkRequest.Builder().build()
+         connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
+             override fun onAvailable(network: Network) {
+                 isNetworkAvailable = true
+             }
+
+             override fun onLost(network: Network) {
+                 isNetworkAvailable = false
+             }
+         })
+         return isNetworkAvailable
+    }
+     fun isDNSAvailable(): Boolean {
+         val address = InetAddress.getByName("www.google.com")
+        return address != null && address.hostAddress.isNotEmpty()
+    }
+
+    fun getIPAddress(useIPv4: Boolean): String? {
+        try {
+            val interfaces = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val networkInterface = interfaces.nextElement()
+                val addresses = networkInterface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val address = addresses.nextElement()
+                    if (!address.isLoopbackAddress) {
+                        val ip = address.hostAddress
+                        val isIPv4 = ip.indexOf(':') < 0
+                        if (useIPv4) {
+                            if (isIPv4) return ip
+                        } else {
+                            if (!isIPv4) {
+                                val delim = ip.indexOf('%')
+                                return if (delim < 0) ip.toUpperCase() else ip.substring(0, delim).toUpperCase()
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
     var sleepTime = SystemClock.uptimeMillis()
 
     fun calculateSleepDuration(): Long {
@@ -340,14 +460,6 @@ object SettingUtil {
             return packageInfo.firstInstallTime.toString()
     }
 
-    fun getSystemLanguage(context: Context): String {
-        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            context.resources.configuration.locale
-        }
-        return locale.displayLanguage
-    }
 
     fun getCountryCode(context: Context): String {
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -362,10 +474,38 @@ object SettingUtil {
         return locale.displayLanguage
     }
 
+    fun getSystemLanguage(): String {
+        val systemLocale = Locale.getDefault()
+        val systemLanguageCode = systemLocale.language
+        return systemLanguageCode
+    }
+
     fun isO3Language(): String {
         val systemLocale = Locale.getDefault()
         val systemLanguageCode = systemLocale.isO3Language
         return systemLanguageCode
+    }
+    fun getProcessCpuUsage(): Int {
+        val processCpuInfo = Debug.getBinderProxyObjectCount()
+        val systemCpuInfo = Debug.threadCpuTimeNanos()
+
+        val cpuUsage = if (systemCpuInfo > 0) {
+            (processCpuInfo.toDouble() / systemCpuInfo.toDouble()) * 100
+        } else {
+            0.0
+        }
+        return cpuUsage.toInt()
+    }
+
+    fun getMobileType(context: Context): String {
+        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val networkType = when (telephonyManager.phoneType) {
+            TelephonyManager.PHONE_TYPE_GSM -> "1"
+            TelephonyManager.PHONE_TYPE_CDMA -> "2"
+            TelephonyManager.PHONE_TYPE_SIP -> "3"
+            else -> "1"
+        }
+        return networkType
     }
 
     fun isLowPowerModeEnabled(context: Context): Boolean {
@@ -401,11 +541,11 @@ object SettingUtil {
     }
     fun getNetworkOperatorName2(context: Context): String {
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        return telephonyManager.networkOperator ?: "Unknown"
+        return telephonyManager.networkOperator ?: "unknown"
     }
     fun getNetworkCountryIso(context: Context): String {
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        return telephonyManager.networkCountryIso ?: "Unknown"
+        return telephonyManager.networkCountryIso ?: "unknown"
     }
     fun getNetworkOperatorName3(context: Context): String {
         val telephonyManager =
@@ -488,26 +628,26 @@ object SettingUtil {
         return if (activeNetwork != null && activeNetwork.isConnected) {
             val type = activeNetwork.type
             when (type) {
-                ConnectivityManager.TYPE_WIFI -> "WiFi"
+                ConnectivityManager.TYPE_WIFI -> "wifi"
                 ConnectivityManager.TYPE_MOBILE -> {
                     val subType = activeNetwork.subtype
                     when (subType) {
                         TelephonyManager.NETWORK_TYPE_GPRS, TelephonyManager.NETWORK_TYPE_EDGE,
-                        TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_IDEN -> "2G"
+                        TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_IDEN -> "2g"
                         TelephonyManager.NETWORK_TYPE_UMTS, TelephonyManager.NETWORK_TYPE_EVDO_0,
                         TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyManager.NETWORK_TYPE_HSDPA,
                         TelephonyManager.NETWORK_TYPE_HSUPA, TelephonyManager.NETWORK_TYPE_HSPA, TelephonyManager.NETWORK_TYPE_EVDO_B,
-                        TelephonyManager.NETWORK_TYPE_EHRPD, TelephonyManager.NETWORK_TYPE_HSPAP -> "3G"
-                        TelephonyManager.NETWORK_TYPE_LTE -> "4G"
-                        TelephonyManager.NETWORK_TYPE_NR -> "5G"
-                        else -> "Mobile"
+                        TelephonyManager.NETWORK_TYPE_EHRPD, TelephonyManager.NETWORK_TYPE_HSPAP -> "3g"
+                        TelephonyManager.NETWORK_TYPE_LTE -> "4g"
+                        TelephonyManager.NETWORK_TYPE_NR -> "5g"
+                        else -> "mobile"
                     }
                 }
 
-                else -> "Other"
+                else -> "other"
             }
         } else {
-            "None"
+            "other"
         }
     }
 
@@ -604,7 +744,25 @@ object SettingUtil {
             null
         }
     }
+    fun getWifiSubnetMask(context: Context): String? {
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return Formatter.formatIpAddress(wifiManager.dhcpInfo.netmask)
+    }
+    fun getWifiDns1(context: Context): String? {
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return Formatter.formatIpAddress(wifiManager.dhcpInfo.dns1)
+    }
+    fun getCurrentWifiSSID(context: Context): String? {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiInfo: WifiInfo? = wifiManager.connectionInfo
+        return wifiInfo?.ssid
+    }
 
+    fun getCurrentWifiMacAddress(context: Context): String? {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiInfo: WifiInfo? = wifiManager.connectionInfo
+        return wifiInfo?.macAddress
+    }
     fun getWifiGatewayIPAddress(context: Context): String? {
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val dhcpInfo = wifiManager.dhcpInfo
@@ -627,5 +785,88 @@ object SettingUtil {
             (value shr 24 and 0xFF).toByte()
         )
     }
+    fun isAPPPhone(context: Context): Boolean {
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        return telephonyManager.phoneType != TelephonyManager.PHONE_TYPE_NONE
+    }
 
+    fun isAPPTablet(context: Context): Boolean {
+        val configuration: Configuration = context.resources.configuration
+        return (configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE)
+    }
+
+    fun isScreenLocked(context: Context): Boolean {
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        return keyguardManager.isKeyguardLocked
+    }
+
+    fun getBatteryStatus(context: Context): String {
+        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        val batteryStatus = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS)
+        when (batteryStatus) {
+            BatteryManager.BATTERY_STATUS_UNKNOWN -> {
+                return "1"
+            }
+            BatteryManager.BATTERY_STATUS_CHARGING -> {
+                return "2"
+            }
+            BatteryManager.BATTERY_STATUS_DISCHARGING -> {
+                return "3"
+            }
+            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> {
+                return "4"
+            }
+            BatteryManager.BATTERY_STATUS_FULL -> {
+                return "5"
+            }
+        }
+        return "1"
+    }
+
+    fun getTotalBatteryCapacity(context: Context): Int {
+        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        val totalCapacity = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+
+        return totalCapacity
+    }
+
+    fun getBatteryPercentage(context: Context): Int {
+        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(null, ifilter)
+        }
+
+        val level: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+
+        return (level * 100 / scale.toFloat()).toInt()
+    }
+
+    fun isCharging(context: Context): Boolean {
+        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(null, ifilter)
+        }
+
+        val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+    }
+
+    fun isACCharging(context: Context): Boolean {
+        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(null, ifilter)
+        }
+
+        val chargePlug: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        return chargePlug == BatteryManager.BATTERY_PLUGGED_AC
+    }
+
+    fun isUSBCharging(context: Context): Boolean {
+        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(null, ifilter)
+        }
+
+        val chargePlug: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        return chargePlug == BatteryManager.BATTERY_PLUGGED_USB
+    }
 }

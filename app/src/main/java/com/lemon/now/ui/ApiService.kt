@@ -20,11 +20,25 @@ interface ApiService {
 
     companion object {
         const val SERVER_URL = "http://149.129.217.31:1360/"
-
+        //https://api.lemonapp.net/
+        const val SERVER_PRI = "https://www.lemonapp.net/privacy.html"
         const val loginToken = "loginToken"
         const val channel = "channel"
         const val firsttime = "firsttime"
         const val phone = "phone"
+
+
+        const val code = "jgquor"
+        const val login = "8dzedi"
+        const val step1 = "2ajjhc"
+        const val step2 = "lgwa98"
+        const val step3 = "l68vn8"
+        const val step4 = "nw6n7q"
+        const val order = "x1o21x"
+        const val face = "dso90g"
+
+        const val register = "ypjkfw"
+        const val applys = "inoxo5"
     }
 
     @FormUrlEncoded

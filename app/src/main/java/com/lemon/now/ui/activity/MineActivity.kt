@@ -40,7 +40,7 @@ class MineActivity : BaseActivity1<LoginModel, ActivityMineBinding>() {
             }
         } else {
             mViewBind.llbank.setOnClickListener {
-                viewModel.getuserinfo(
+                viewModel.getuserinfo(true,
                     SettingUtil.isVpnConnected(this@MineActivity).toString(),
                     SettingUtil.getAvailableSimSlots(this@MineActivity).toString(),
                     SettingUtil.getActivatedSimCount(this@MineActivity).toString()
@@ -53,7 +53,10 @@ class MineActivity : BaseActivity1<LoginModel, ActivityMineBinding>() {
             startActivity(Intent(this@MineActivity, AboutusActivity::class.java))
         }
         mViewBind.llprivacy.setOnClickListener {
-            startActivity(Intent(this@MineActivity, PrivacyActivity::class.java))
+            val intent = Intent(this@MineActivity, WebActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.putExtra("url", ApiService.SERVER_PRI)
+            startActivity(intent)
         }
 
     }
