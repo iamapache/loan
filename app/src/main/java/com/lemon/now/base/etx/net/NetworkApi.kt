@@ -1,6 +1,5 @@
 package com.lemon.now.base.etx.net
 
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.lemon.now.ui.ApiService
 import okhttp3.OkHttpClient
@@ -80,9 +79,6 @@ class NetworkApi : BaseNetworkApi() {
     }
     fun getHttpLoggingInterceptor(): HttpLoggingInterceptor? {
         val loggingInterceptor = HttpLoggingInterceptor { message ->
-            Log.i(
-                "OkHttp", "log = $message"
-            )
         }
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return loggingInterceptor

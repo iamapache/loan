@@ -2,6 +2,8 @@ package com.lemon.now.ui.activity
 
 import ToastUtils
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.lemon.now.base.activity.BaseActivity1
@@ -47,9 +49,20 @@ class BankActivity : BaseActivity1<HomeViewModel, ActivityBankBinding>() {
                 )
             }
         }
-        viewModel.authinfo()
-    }
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            showLoading("loading")
+            viewModel.authinfo()
+        }, 500)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+            dismissLoading()
 
+        }, 2000)
+    }
+    override fun onRestart() {
+        super.onRestart()
+
+
+    }
     override fun createObserver() {
 
         mViewModel.bankdata.observe(this, Observer {

@@ -20,11 +20,6 @@ fun View.gone() {
     visibility = View.GONE
 }
 
-/**
- * 兼容API获取屏幕信息
- * @param context
- * @return
- */
 fun getDisplay(context: Context): Display? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         getDisplayApiR(context)

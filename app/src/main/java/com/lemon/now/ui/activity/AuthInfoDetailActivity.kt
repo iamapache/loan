@@ -76,6 +76,8 @@ class AuthInfoDetailActivity : BaseActivity<AuthModel, ActivityAuthinfo2Binding>
                 mDatabind.whatsapp.setText( it.vJ66bDlFvxStgaxLp.toString())
                 mDatabind.mail.setText( it.ZheSOnZb6V2S1InXqk69.toString())
                 mDatabind.facebook.setText( it.jtwU2xNJjC.toString())
+
+                mDatabind.mintv.text ="₹ " +it.sxaJHj03AOxHpo2O47qKyr.toString()
                 mDatabind.textViewProgress.text = "₹ " + it.RUagIHMvlGBEDR.toString()
 
                 if(!it.RUagIHMvlGBEDR.isNullOrEmpty()){

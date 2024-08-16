@@ -15,6 +15,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.ProxyInfo
+import android.net.Uri
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
@@ -30,6 +32,8 @@ import android.util.Base64
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
+import com.facebook.appevents.internal.AppEventUtility.bytesToHex
 import com.lemon.now.online.BuildConfig
 import com.lemon.now.ui.activity.AuthenticationActivity
 import com.lemon.now.ui.activity.OrderActivity
@@ -52,16 +56,41 @@ import java.util.zip.Deflater
 
 
 object SettingUtil {
+    fun arePermissionsGranted(activity: Context?, permissions: Array<String?>): Boolean {
+        for (permission in permissions) {
+            if (ActivityCompat.checkSelfPermission(
+                    activity!!,
+                    permission!!
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false
+            }
+        }
+        return true
+    }
 
-     fun startOtherActivity(context: Context,it: OrderStatusBean,productdd:String) {
+    fun startOtherActivity(context: Context, it: OrderStatusBean, productdd: String) {
+        val permissions = arrayOf<String?>(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_SMS,
+            Manifest.permission.READ_PHONE_STATE
+        )
+        val granted = SettingUtil.arePermissionsGranted(context, permissions)
+        if (!granted) {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", context.packageName, null)
+            intent.data = uri
+            context.startActivity(intent)
+            return
+        }
         when (it.nQvJKMbHsO5F) {
             1 -> {
                 val intent = Intent(context, AuthenticationActivity::class.java)
                 context.startActivity(intent)
-
             }
 
             2 -> {
+
                 val intent = Intent(context, OrderActivity::class.java)
                 intent.putExtra("id", productdd)
                 intent.putExtra("bean", it.Qbnsde5LgABnpY9IpFTFXkgR3l8)
@@ -172,6 +201,7 @@ object SettingUtil {
         }
         return dir.delete()
     }
+
     fun clearAllCache(activity: AppCompatActivity?) {
         activity?.let {
             deleteDir(it.cacheDir)
@@ -181,14 +211,15 @@ object SettingUtil {
                 return
             }
             it.externalCacheDir?.let { file ->
-                if(deleteDir(file)){
+                if (deleteDir(file)) {
                 }
             }
         }
     }
+
     @SuppressLint("SuspiciousIndentation")
     fun isEmulator(): String {
-     var boo=   (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
+        var boo = (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
                 Build.FINGERPRINT.startsWith("generic") ||
                 Build.FINGERPRINT.startsWith("unknown") ||
                 Build.HARDWARE.contains("goldfish") ||
@@ -196,9 +227,9 @@ object SettingUtil {
                 Build.MODEL.contains("google_sdk") ||
                 Build.MODEL.contains("Emulator") ||
                 Build.MODEL.contains("Android SDK built for x86")
-        if (boo){
+        if (boo) {
             return "1"
-        }else{
+        } else {
             return "0"
         }
         return "0"
@@ -214,6 +245,7 @@ object SettingUtil {
                 Build.MODEL.contains("Emulator") ||
                 Build.MODEL.contains("Android SDK built for x86")
     }
+
     fun isDeviceRooted2(): Boolean {
         val buildTags = Build.TAGS
         if (buildTags != null && buildTags.contains("test-keys")) {
@@ -243,7 +275,7 @@ object SettingUtil {
         var file2: File? = null
         try {
             for (path in paths) {
-                file2 =  File(path + "busybox");
+                file2 = File(path + "busybox");
                 if (file2.exists() && file2.canExecute()) {
                     return true
                 }
@@ -253,6 +285,7 @@ object SettingUtil {
         }
         return false
     }
+
     fun String.base64(): String {
         try {
             val comp = Deflater(Deflater.BEST_COMPRESSION)
@@ -271,6 +304,7 @@ object SettingUtil {
             return ""
         }
     }
+
     fun isDeviceRooted(): Int {
         val buildTags = Build.TAGS
         if (buildTags != null && buildTags.contains("test-keys")) {
@@ -300,7 +334,7 @@ object SettingUtil {
         var file2: File? = null
         try {
             for (path in paths) {
-                file2 =  File(path + "busybox");
+                file2 = File(path + "busybox");
                 if (file2.exists() && file2.canExecute()) {
                     return 1
                 }
@@ -310,64 +344,72 @@ object SettingUtil {
         }
         return 0
     }
+
     private const val PERMISSION_READ_PHONE_STATE = 101
 
     @SuppressLint("SuspiciousIndentation")
     fun getAvailableSimSlots(context: Context): Int {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         var availableSimSlots = 0
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    context as Activity,
-                    arrayOf(Manifest.permission.READ_PHONE_STATE),
-                    PERMISSION_READ_PHONE_STATE
-                )
-            } else {
-                if (telephonyManager.phoneCount > 1) {
-                    availableSimSlots = telephonyManager.phoneCount
-                }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                PERMISSION_READ_PHONE_STATE
+            )
+        } else {
+            if (telephonyManager.phoneCount > 1) {
+                availableSimSlots = telephonyManager.phoneCount
             }
+        }
 
         return availableSimSlots
     }
+
     @SuppressLint("SuspiciousIndentation")
     fun getActivatedSimCount(context: Context): Int {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    context as Activity,
-                    arrayOf(Manifest.permission.READ_PHONE_STATE),
-                    PERMISSION_READ_PHONE_STATE
-                )
-                return 0
-            } else {
-                var simState: Int =0
-                var numSimCards = 0
-                for (i in 1 until getAvailableSimSlots(context)) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        simState = telephonyManager.getSimState(i)
-                    }
-                    if (simState == TelephonyManager.SIM_STATE_READY) {
-                        numSimCards++
-                    }
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                PERMISSION_READ_PHONE_STATE
+            )
+            return 0
+        } else {
+            var simState: Int = 0
+            var numSimCards = 0
+            for (i in 1 until getAvailableSimSlots(context)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    simState = telephonyManager.getSimState(i)
                 }
-
-                return numSimCards
+                if (simState == TelephonyManager.SIM_STATE_READY) {
+                    numSimCards++
+                }
             }
 
+            return numSimCards
+        }
+
     }
+
     fun isVpnConnected(context: Context): Int {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val networks = connectivityManager.allNetworks
             for (network in networks) {
                 val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
                 if (networkCapabilities != null && networkCapabilities.hasTransport(
-                        NetworkCapabilities.TRANSPORT_VPN)) {
+                        NetworkCapabilities.TRANSPORT_VPN
+                    )
+                ) {
                     return 1
                 }
             }
@@ -379,35 +421,41 @@ object SettingUtil {
         }
         return 0
     }
+
     fun isUsingProxy(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val network = connectivityManager.activeNetwork
             val proxyInfo = connectivityManager.getLinkProperties(network)
             return proxyInfo?.isPrivateDnsActive() != null
         } else {
             val networkInfo = connectivityManager.activeNetworkInfo
-            return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_MOBILE // 假设使用移动网络时使用了代理
+            return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_MOBILE
         }
     }
 
-     fun isNetworkAvailable(context: Context): Boolean {
-          var isNetworkAvailable: Boolean = false
-         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-         val networkRequest = NetworkRequest.Builder().build()
-         connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
-             override fun onAvailable(network: Network) {
-                 isNetworkAvailable = true
-             }
+    fun isNetworkAvailable(context: Context): Boolean {
+        var isNetworkAvailable: Boolean = false
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkRequest = NetworkRequest.Builder().build()
+        connectivityManager.registerNetworkCallback(
+            networkRequest,
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    isNetworkAvailable = true
+                }
 
-             override fun onLost(network: Network) {
-                 isNetworkAvailable = false
-             }
-         })
-         return isNetworkAvailable
+                override fun onLost(network: Network) {
+                    isNetworkAvailable = false
+                }
+            })
+        return isNetworkAvailable
     }
-     fun isDNSAvailable(): Boolean {
-         val address = InetAddress.getByName("www.google.com")
+
+    fun isDNSAvailable(): Boolean {
+        val address = InetAddress.getByName("www.google.com")
         return address != null && address.hostAddress.isNotEmpty()
     }
 
@@ -427,7 +475,8 @@ object SettingUtil {
                         } else {
                             if (!isIPv4) {
                                 val delim = ip.indexOf('%')
-                                return if (delim < 0) ip.toUpperCase() else ip.substring(0, delim).toUpperCase()
+                                return if (delim < 0) ip.toUpperCase() else ip.substring(0, delim)
+                                    .toUpperCase()
                             }
                         }
                     }
@@ -438,6 +487,7 @@ object SettingUtil {
         }
         return null
     }
+
     var sleepTime = SystemClock.uptimeMillis()
 
     fun calculateSleepDuration(): Long {
@@ -445,6 +495,7 @@ object SettingUtil {
         val sleepDuration = wakeUpTime - sleepTime
         return sleepDuration
     }
+
     fun getLastUpdateTime(packageManager: PackageManager, packageName: String): String {
         return try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
@@ -455,20 +506,24 @@ object SettingUtil {
             "no"
         }
     }
+
     fun firstInstallTime(packageManager: PackageManager, packageName: String): String {
-            val packageInfo = packageManager.getPackageInfo(packageName, 0)
-            return packageInfo.firstInstallTime.toString()
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        return packageInfo.firstInstallTime.toString()
     }
 
 
     fun getCountryCode(context: Context): String {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.networkCountryIso
     }
+
     fun getCountryCode2(context: Context): String {
         val locale = context.resources.configuration.locale
         return locale.country
     }
+
     fun getDisplayLanguage(context: Context): String {
         val locale = context.resources.configuration.locale
         return locale.displayLanguage
@@ -485,6 +540,7 @@ object SettingUtil {
         val systemLanguageCode = systemLocale.isO3Language
         return systemLanguageCode
     }
+
     fun getProcessCpuUsage(): Int {
         val processCpuInfo = Debug.getBinderProxyObjectCount()
         val systemCpuInfo = Debug.threadCpuTimeNanos()
@@ -498,7 +554,8 @@ object SettingUtil {
     }
 
     fun getMobileType(context: Context): String {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val networkType = when (telephonyManager.phoneType) {
             TelephonyManager.PHONE_TYPE_GSM -> "1"
             TelephonyManager.PHONE_TYPE_CDMA -> "2"
@@ -516,47 +573,60 @@ object SettingUtil {
             false
         }
     }
+
     fun isAutoBrightnessEnabled(context: Context): Boolean {
         val contentResolver: ContentResolver = context.contentResolver
         return try {
-            val mode = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE)
+            val mode =
+                Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE)
             mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
         } catch (e: Settings.SettingNotFoundException) {
             e.printStackTrace()
             false
         }
     }
+
     fun getNetworkOperatorName(context: Context): String {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.networkOperatorName
     }
+
     fun isDebugMode(): Boolean {
         return BuildConfig.DEBUG
     }
 
     fun isSimCardReady(context: Context): Boolean {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val simState = telephonyManager.simState
         return simState == TelephonyManager.SIM_STATE_READY
     }
+
     fun getNetworkOperatorName2(context: Context): String {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.networkOperator ?: "unknown"
     }
+
     fun getNetworkCountryIso(context: Context): String {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.networkCountryIso ?: "unknown"
     }
+
     fun getNetworkOperatorName3(context: Context): String {
         val telephonyManager =
             context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.networkOperatorName
     }
+
     fun getApplicationSignatureMD5(context: Context): String {
         try {
             val packageName = context.packageName
             val packageManager = context.packageManager
-            val signatures = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+            val signatures =
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
             val md = MessageDigest.getInstance("MD5")
             for (signature in signatures) {
                 md.update(signature.toByteArray())
@@ -575,7 +645,8 @@ object SettingUtil {
     fun getApplicationSignatureSHA1(context: Context): String {
         val packageName = context.packageName
         val packageManager = context.packageManager
-        val signatures = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+        val signatures =
+            packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
         val signature = signatures[0]
         val messageDigest = MessageDigest.getInstance("SHA1")
         messageDigest.update(signature.toByteArray())
@@ -588,7 +659,8 @@ object SettingUtil {
     }
 
     fun getWifiSSID(context: Context): String {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val wifiInfo: WifiInfo? = wifiManager.connectionInfo
         return wifiInfo?.ssid ?: ""
     }
@@ -620,6 +692,7 @@ object SettingUtil {
         }
         return builder.toString()
     }
+
     //net
     open fun getNetworkType(context: Context): String? {
         val connectivityManager =
@@ -634,10 +707,12 @@ object SettingUtil {
                     when (subType) {
                         TelephonyManager.NETWORK_TYPE_GPRS, TelephonyManager.NETWORK_TYPE_EDGE,
                         TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_IDEN -> "2g"
+
                         TelephonyManager.NETWORK_TYPE_UMTS, TelephonyManager.NETWORK_TYPE_EVDO_0,
                         TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyManager.NETWORK_TYPE_HSDPA,
                         TelephonyManager.NETWORK_TYPE_HSUPA, TelephonyManager.NETWORK_TYPE_HSPA, TelephonyManager.NETWORK_TYPE_EVDO_B,
                         TelephonyManager.NETWORK_TYPE_EHRPD, TelephonyManager.NETWORK_TYPE_HSPAP -> "3g"
+
                         TelephonyManager.NETWORK_TYPE_LTE -> "4g"
                         TelephonyManager.NETWORK_TYPE_NR -> "5g"
                         else -> "mobile"
@@ -652,7 +727,8 @@ object SettingUtil {
     }
 
     fun is4GNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         if (networkInfo != null && networkInfo.isConnected) {
             if (networkInfo.type == ConnectivityManager.TYPE_MOBILE) {
@@ -661,8 +737,10 @@ object SettingUtil {
         }
         return false
     }
+
     fun is5GNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         if (networkInfo != null && networkInfo.isConnected) {
             if (networkInfo.type == ConnectivityManager.TYPE_MOBILE) {
@@ -673,22 +751,28 @@ object SettingUtil {
     }
 
     fun isWifiConnected(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected && networkInfo.type == ConnectivityManager.TYPE_WIFI
     }
+
     fun isMobileDataEnabled(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return connectivityManager.activeNetworkInfo?.isConnected ?: false
                 && telephonyManager.dataState == TelephonyManager.DATA_CONNECTED
     }
 
     fun isNetworkConnected(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
+
     fun getIPAddress(): String? {
         try {
             val interfaces = NetworkInterface.getNetworkInterfaces()
@@ -728,7 +812,8 @@ object SettingUtil {
     }
 
     fun getWifiIPAddress(context: Context): String? {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val wifiInfo: WifiInfo? = wifiManager.connectionInfo
         val ipAddress: Int? = wifiInfo?.ipAddress
         return if (ipAddress != null) {
@@ -744,27 +829,34 @@ object SettingUtil {
             null
         }
     }
+
     fun getWifiSubnetMask(context: Context): String? {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
         return Formatter.formatIpAddress(wifiManager.dhcpInfo.netmask)
     }
+
     fun getWifiDns1(context: Context): String? {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
         return Formatter.formatIpAddress(wifiManager.dhcpInfo.dns1)
     }
+
     fun getCurrentWifiSSID(context: Context): String? {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val wifiInfo: WifiInfo? = wifiManager.connectionInfo
         return wifiInfo?.ssid
     }
 
     fun getCurrentWifiMacAddress(context: Context): String? {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val wifiInfo: WifiInfo? = wifiManager.connectionInfo
         return wifiInfo?.macAddress
     }
+
     fun getWifiGatewayIPAddress(context: Context): String? {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val dhcpInfo = wifiManager.dhcpInfo
 
         val gatewayIpAddress = dhcpInfo.gateway
@@ -785,6 +877,7 @@ object SettingUtil {
             (value shr 24 and 0xFF).toByte()
         )
     }
+
     fun isAPPPhone(context: Context): Boolean {
         val telephonyManager =
             context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -795,6 +888,57 @@ object SettingUtil {
         val configuration: Configuration = context.resources.configuration
         return (configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE)
+    }
+
+    fun getNetworkWifiLevel(context: Context): Int {
+        if (!isWifiConnected(context)) {
+            return 0
+        }
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiInfo = wifiManager.connectionInfo
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val level = wifiInfo.rssi
+            return if (level <= 0 && level >= -50) {
+                1
+            } else if (level < -50 && level >= -70) {
+                2
+            } else if (level < -70 && level >= -80) {
+                3
+            } else if (level < -80 && level >= -100) {
+                4
+            } else {
+                5
+            }
+        }
+        return 0
+    }
+
+    fun getProxyTypeForWiFi(context: Context): String? {
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        val linkProperties = connectivityManager.getLinkProperties(network)
+
+        if (networkCapabilities != null && networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            linkProperties?.let {
+                val proxyInfo: ProxyInfo? = it.httpProxy
+                if (proxyInfo != null) {
+                    val proxyHost = proxyInfo.host
+                    val proxyPort = proxyInfo.port
+                    val proxyType = when {
+                        proxyInfo?.exclusionList?.isNotEmpty() == true -> return "PAC"
+                        proxyHost?.isNotEmpty() == true -> return "Manual"
+                        else -> return "None"
+                    }
+                } else {
+                }
+            } ?: run {
+            }
+        } else {
+        }
+        return "NONE"
     }
 
     fun isScreenLocked(context: Context): Boolean {
@@ -809,15 +953,19 @@ object SettingUtil {
             BatteryManager.BATTERY_STATUS_UNKNOWN -> {
                 return "1"
             }
+
             BatteryManager.BATTERY_STATUS_CHARGING -> {
                 return "2"
             }
+
             BatteryManager.BATTERY_STATUS_DISCHARGING -> {
                 return "3"
             }
+
             BatteryManager.BATTERY_STATUS_NOT_CHARGING -> {
                 return "4"
             }
+
             BatteryManager.BATTERY_STATUS_FULL -> {
                 return "5"
             }

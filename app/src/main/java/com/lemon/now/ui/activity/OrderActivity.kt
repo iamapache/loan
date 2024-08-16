@@ -33,6 +33,7 @@ import com.bumptech.glide.Glide
 import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
 import com.google.gson.Gson
+import com.lemon.now.base.App
 import com.lemon.now.base.activity.BaseActivity1
 import com.lemon.now.base.etx.util.e
 import com.lemon.now.base.etx.util.singleClick
@@ -82,7 +83,9 @@ import com.lemon.now.util.SettingUtil.getNetworkOperatorName
 import com.lemon.now.util.SettingUtil.getNetworkOperatorName2
 import com.lemon.now.util.SettingUtil.getNetworkOperatorName3
 import com.lemon.now.util.SettingUtil.getNetworkType
+import com.lemon.now.util.SettingUtil.getNetworkWifiLevel
 import com.lemon.now.util.SettingUtil.getProcessCpuUsage
+import com.lemon.now.util.SettingUtil.getProxyTypeForWiFi
 import com.lemon.now.util.SettingUtil.getSHA256
 import com.lemon.now.util.SettingUtil.getSystemLanguage
 import com.lemon.now.util.SettingUtil.getTotalBatteryCapacity
@@ -354,7 +357,7 @@ class OrderActivity : BaseActivity1<HomeViewModel, ActivityOrderBinding>() {
                     "android",
                     this.getString(R.string.app_name),
                     channel,
-                    "",
+                    Settings.Secure.getString(App.instance.getContentResolver(), Settings.Secure.ANDROID_ID)?:"",
                     googleadid,
                     firsttime,
                     SystemClock.elapsedRealtime().toString(),
@@ -390,17 +393,17 @@ class OrderActivity : BaseActivity1<HomeViewModel, ActivityOrderBinding>() {
                     Build.PRODUCT,
                     getSHA256(this) ?: "",
                     packageManager.getPackageInfo(packageName, 0).applicationInfo.sourceDir,
-                    "","",
+                    "",Build.VERSION.INCREMENTAL,
                     "true",
                     Build.USER,
                     UUID.randomUUID().toString(),
                     "false",
                     getWifiSSID(this),
                     "true",
-                    "","true",
+                    Build.VERSION.RELEASE,"true",
                     "true",
                     referrerurl,
-                    "",
+                    getProxyTypeForWiFi(this),
                     Locale.getDefault().country,"","",
                 //net
                     getNetworkType(this).toString(),
@@ -436,7 +439,7 @@ class OrderActivity : BaseActivity1<HomeViewModel, ActivityOrderBinding>() {
                     Build.BOARD,
                     Build.CPU_ABI.toString(),
                     Build.CPU_ABI2.toString(),
-                    "",
+                    getNetworkWifiLevel(this).toString(),
                     Build.MODEL,
                     Build.BRAND,
                     Build.MANUFACTURER,
@@ -536,9 +539,24 @@ class OrderActivity : BaseActivity1<HomeViewModel, ActivityOrderBinding>() {
                     if (it.FUiNUblg6avFY2 == 0) {
                         val dialog = CustomDialog(this@OrderActivity)
                         dialog.setConfirmCallback {
-                            val intent = Intent(this@OrderActivity, UserFaceActivity::class.java)
-                            intent.putExtra("phototext", it.FC9KFV7R3tgHg3grZ8uvFak7NdzLXMR7)
-                            someActivityResultLauncher.launch(intent)
+                            val permissions = arrayOf<String?>(
+                                Manifest.permission.CAMERA,
+                                Manifest.permission.READ_SMS,
+                                Manifest.permission.READ_PHONE_STATE
+                            )
+                            val granted = SettingUtil.arePermissionsGranted(this, permissions)
+                            if (!granted) {
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                val uri = Uri.fromParts("package", packageName, null)
+                                intent.data = uri
+                                startActivity(intent)
+                            }
+                            else {
+                                val intent =
+                                    Intent(this@OrderActivity, UserFaceActivity::class.java)
+                                intent.putExtra("phototext", it.FC9KFV7R3tgHg3grZ8uvFak7NdzLXMR7)
+                                someActivityResultLauncher.launch(intent)
+                            }
                         }
                         dialog.setCancelCallback {
 

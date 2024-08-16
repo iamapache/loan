@@ -134,7 +134,7 @@
                     android:id="@+id/getotp"
                     android:layout_width="85dp"
                     android:layout_height="40dp"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="10dp"
                     android:background="@drawable/button_shap"
                     android:gravity="center"
                     android:text="Get OTP"

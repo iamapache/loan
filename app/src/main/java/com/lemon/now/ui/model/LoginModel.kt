@@ -18,7 +18,7 @@ import com.lemon.now.util.SettingUtil
  *
  */
 class LoginModel  : BaseViewModel() {
-    var username = StringObservableField("9130364602")
+    var username = StringObservableField("")
     var editText = StringObservableField()
     var editText2 = StringObservableField()
     var editText3 = StringObservableField()

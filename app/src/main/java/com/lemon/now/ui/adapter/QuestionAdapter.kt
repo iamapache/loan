@@ -42,7 +42,7 @@ class QuestionAdapter(private val listener: OnItemClickListener,private val ques
         fun onItemClick(position: Int)
         fun delete(position: Int)
     }
-    override fun getItemCount() = questionList.size + 1 // 加上默认项
+    override fun getItemCount() = questionList.size + 1
 
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) VIEW_TYPE_DEFAULT else VIEW_TYPE_NORMAL
@@ -50,7 +50,6 @@ class QuestionAdapter(private val listener: OnItemClickListener,private val ques
 
     inner class DefaultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
-            // 为默认项设置点击事件监听器
             itemView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {

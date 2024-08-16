@@ -1,9 +1,9 @@
 package com.lemon.now.base.etx.util
 
 import android.util.Log
-
+import com.lemon.now.online.BuildConfig
 const val TAG = "xxx"
-var jetpackMvvmLog = true
+var mLog = BuildConfig.DEBUG
 
 private enum class LEVEL {
     V, D, I, W, E
@@ -21,7 +21,7 @@ fun String.loge(tag: String = TAG) =
     log(LEVEL.E, tag, this)
 
 private fun log(level: LEVEL, tag: String, message: String) {
-    if (!jetpackMvvmLog) return
+    if (!mLog) return
 
     when (level) {
         LEVEL.V -> Log.v(tag, message)
@@ -38,7 +38,6 @@ fun e(TAG: String, msg: String) {
     var start = 0
     var end = LOG_MAXLENGTH
     for (i in 0..99) {
-        //剩下的文本还是大于规定长度则继续重复截取并输出
         if (strLength > end) {
             Log.e(TAG + i, msg.substring(start, end))
             start = end

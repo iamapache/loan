@@ -30,7 +30,7 @@ class App : BaseApp() {
         val appToken: String = "hy5alh7rzpq8"
         val environment: String =  AdjustConfig.ENVIRONMENT_PRODUCTION
         val config = AdjustConfig(this, appToken, environment)
-        config.setUrlStrategy(AdjustConfig.URL_STRATEGY_CHINA);
+        config.setUrlStrategy(AdjustConfig.URL_STRATEGY_INDIA);
         if(BuildConfig.DEBUG){
             FacebookSdk.setIsDebugEnabled(true);
             FacebookSdk.addLoggingBehavior(LoggingBehavior.APP_EVENTS)

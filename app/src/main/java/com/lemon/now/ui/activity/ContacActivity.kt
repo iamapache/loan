@@ -1,10 +1,12 @@
 package com.lemon.now.ui.activity
 
 import ToastUtils
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.Settings
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
@@ -72,7 +74,7 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
         mViewModel.authinfoData.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
 
-                if(!it.kFhzAgCSnIpIsJD.isNullOrEmpty()){
+                if (!it.kFhzAgCSnIpIsJD.isNullOrEmpty()) {
                     val listType: Type = object : TypeToken<List<Contactbean>>() {}.type
                     val gson = Gson()
                     val list: List<Contactbean> = gson.fromJson(it.kFhzAgCSnIpIsJD, listType)
@@ -87,10 +89,10 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
                         }
                     }
                     extracted(list, it)
-                }else{
-                        for (i in 1..it.PLnVmUR) {
-                            addRowLayout()
-                        }
+                } else {
+                    for (i in 1..it.PLnVmUR) {
+                        addRowLayout()
+                    }
                     extracted2(it)
                 }
 
@@ -112,23 +114,34 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
                             val name = linearLayout.findViewById<EditText>(R.id.name)
                             val pick = linearLayout.findViewById<ImageView>(R.id.pick)
                             val relation = linearLayout.findViewById<TextView>(R.id.relation)
+                            val jsonObject = JSONObject()
+                            if (i < it.PLnVmUR) {
+                                if (number.text.toString().isNotEmpty() && name.text.toString()
+                                        .isNotEmpty()
+                                    && relation.text.toString().isNotEmpty()
+                                ) {
+                                    jsonObject.put("contactName", name.text.toString())
+                                    jsonObject.put("contactPhone", number.text.toString())
+                                    jsonObject.put("contactRelation", relation.text.toString())
+                                    jsonArray.put(jsonObject)
 
-                            if (number.text.toString().isNotEmpty() && name.text.toString()
-                                    .isNotEmpty()
-                                && relation.text.toString().isNotEmpty()
-                            ) {
-                                val jsonObject = JSONObject()
-                                jsonObject.put("contactName", name.text.toString())
-                                jsonObject.put("contactPhone", number.text.toString())
-                                jsonObject.put("contactRelation", relation.text.toString())
-                                jsonArray.put(jsonObject)
-
-                            } else {
-                                ToastUtils.showShort(
-                                    this@ContacActivity,
-                                    "Please fill in all the information"
-                                )
-                                return@setOnClickListener
+                                } else {
+                                    ToastUtils.showShort(
+                                        this@ContacActivity,
+                                        "Please fill in all the information"
+                                    )
+                                    return@setOnClickListener
+                                }
+                            }else{
+                                if (number.text.toString().isNotEmpty() && name.text.toString()
+                                        .isNotEmpty()
+                                    && relation.text.toString().isNotEmpty()
+                                ) {
+                                    jsonObject.put("contactName", name.text.toString())
+                                    jsonObject.put("contactPhone", number.text.toString())
+                                    jsonObject.put("contactRelation", relation.text.toString())
+                                    jsonArray.put(jsonObject)
+                                }
                             }
                         }
 
@@ -180,9 +193,23 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
                 if (it.FUiNUblg6avFY2 == 0) {
                     val dialog = CustomDialog(this@ContacActivity)
                     dialog.setConfirmCallback {
-                        val intent = Intent(this@ContacActivity, UserFaceActivity::class.java)
-                        intent.putExtra("phototext", "")
-                        someActivityResultLauncher.launch(intent)
+                        val permissions = arrayOf<String?>(
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.READ_SMS,
+                            Manifest.permission.READ_PHONE_STATE
+                        )
+                        val granted = SettingUtil.arePermissionsGranted(this, permissions)
+                        if (!granted) {
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val uri = Uri.fromParts("package", packageName, null)
+                            intent.data = uri
+                            startActivity(intent)
+                        }
+                        else {
+                            val intent = Intent(this@ContacActivity, UserFaceActivity::class.java)
+                            intent.putExtra("phototext", "")
+                            someActivityResultLauncher.launch(intent)
+                        }
                     }
                     dialog.setCancelCallback {
 
@@ -200,12 +227,26 @@ class ContacActivity : BaseActivity1<AuthModel, ActivityAuthcontacBinding>() {
                     dialogWindow.attributes = p
                 } else {
                     if (it.Qbnsde5LgABnpY9IpFTFXkgR3l8 != null) {
-                        val intent = Intent(this@ContacActivity, OrderActivity::class.java)
-                        intent.putExtra("id", it.Qbnsde5LgABnpY9IpFTFXkgR3l8.nJNb2VY6)
-                        intent.putExtra("bean", it.Qbnsde5LgABnpY9IpFTFXkgR3l8)
-                        startActivity(intent)
-                        EventBus.getDefault().post(MessageEvent(MessageEvent.finish, ""))
-                        finish()
+                        val permissions = arrayOf<String?>(
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.READ_SMS,
+                            Manifest.permission.READ_PHONE_STATE
+                        )
+                        val granted = SettingUtil.arePermissionsGranted(this, permissions)
+                        if (!granted) {
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val uri = Uri.fromParts("package", packageName, null)
+                            intent.data = uri
+                            startActivity(intent)
+                        }
+                        else {
+                            val intent = Intent(this@ContacActivity, OrderActivity::class.java)
+                            intent.putExtra("id", it.Qbnsde5LgABnpY9IpFTFXkgR3l8.nJNb2VY6)
+                            intent.putExtra("bean", it.Qbnsde5LgABnpY9IpFTFXkgR3l8)
+                            startActivity(intent)
+                            EventBus.getDefault().post(MessageEvent(MessageEvent.finish, ""))
+                            finish()
+                        }
                     } else {
                         startActivity(Intent(this, MainActivity::class.java))
                         finish()

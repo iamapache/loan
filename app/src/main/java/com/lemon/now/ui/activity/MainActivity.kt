@@ -2,8 +2,11 @@ package com.lemon.now.ui.activity
 
 import SPUtil
 import ToastUtils
+import android.Manifest
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
@@ -16,11 +19,7 @@ import com.lemon.now.online.databinding.ActivityMainBinding
 import com.lemon.now.ui.ApiService.Companion.loginToken
 import com.lemon.now.ui.bean.O2Hvk1wvAGN
 import com.lemon.now.ui.model.HomeViewModel
-import com.lemon.now.ui.model.MessageEvent
 import com.lemon.now.util.SettingUtil
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import kotlin.random.Random
 
 
@@ -37,12 +36,25 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
                     )
                 )
             } else {
+                val permissions = arrayOf<String?>(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_SMS,
+                    Manifest.permission.READ_PHONE_STATE
+                )
+                val granted = SettingUtil.arePermissionsGranted(this, permissions)
+                if (!granted) {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                }
+                else {
                 startActivity(
                     Intent(
                         this@MainActivity,
                         OrderListActivity::class.java
                     )
-                )
+                )}
             }
         }
         mViewBind.llfb.setOnClickListener {
@@ -53,42 +65,38 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
                     ))
         }
         mViewBind.llMine.setOnClickListener {
+            val permissions = arrayOf<String?>(
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_SMS,
+                Manifest.permission.READ_PHONE_STATE
+            )
+            val granted = SettingUtil.arePermissionsGranted(this, permissions)
+            if (!granted) {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            else {
             startActivity(
                 Intent(
                     this@MainActivity,
                     MineActivity::class.java
                 )
-            )
+            )}
         }
 
         mViewBind.swipeRefreshLayout.setOnRefreshListener {
             getHomeData()
+
         }
         mViewModel.firsttime()
-
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
         getHomeData()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        EventBus.getDefault().unregister(this)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun Event(messageEvent: MessageEvent) {
-        if (messageEvent.getStatus() == MessageEvent.login) {
-            getHomeData()
-        } else if (messageEvent.getStatus() == MessageEvent.au) {
-            mViewModel.getuserinfo(true,SettingUtil.isVpnConnected(this@MainActivity).toString(),SettingUtil.getAvailableSimSlots(this@MainActivity).toString(),
-                SettingUtil.getActivatedSimCount(this@MainActivity).toString())
-        }
+    override fun onRestart() {
+        super.onRestart()
+        getHomeData()
     }
 
     private fun getHomeData() {
@@ -184,20 +192,41 @@ class MainActivity : BaseActivity1<HomeViewModel, ActivityMainBinding>() {
                     mViewBind.hometop.setBackgroundResource(R.mipmap.auhometop)
                 }
                 mViewBind.layoutProduct.next.setOnClickListener {
-                    mViewModel.checkorderstatus(productdd,SettingUtil.isVpnConnected(this@MainActivity).toString(),SettingUtil.getAvailableSimSlots(this@MainActivity).toString(),
-                        SettingUtil.getActivatedSimCount(this@MainActivity).toString())
+                    val permissions = arrayOf<String?>(
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_SMS,
+                        Manifest.permission.READ_PHONE_STATE
+                    )
+                    val granted = SettingUtil.arePermissionsGranted(this, permissions)
+                    if (!granted) {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri = Uri.fromParts("package", packageName, null)
+                        intent.data = uri
+                        startActivity(intent)
+                    }
+                    else {
+                        mViewModel.checkorderstatus(
+                            productdd,
+                            SettingUtil.isVpnConnected(this@MainActivity).toString(),
+                            SettingUtil.getAvailableSimSlots(this@MainActivity).toString(),
+                            SettingUtil.getActivatedSimCount(this@MainActivity).toString()
+                        )
+                    }
                 }
             }
         })
 
         mViewModel.orderstatusdata.observe(this, Observer {
             if (it.rZ81DSU7WU4hny4ukGHljvjO41bfB == 1) {
-                SettingUtil.startOtherActivity(this, it, productdd)
+                    SettingUtil.startOtherActivity(this, it, productdd)
             }else {
                 ToastUtils.showShort(this@MainActivity, it.vWCgp64OkxPVoGqics)
             }
         })
     }
+
+
+
 
     private fun updata(it: O2Hvk1wvAGN) {
         mViewBind.layoutProduct.pfdroDCductName.text = it.zTAPvIwFI3Sv7UZv2SVGDrIOePGxxR9AqV

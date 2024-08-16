@@ -3,12 +3,10 @@ package com.lemon.now.ui.activity
 import ToastUtils
 import android.content.Intent
 import android.graphics.BitmapFactory
-
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Observer
 import com.adjust.sdk.Adjust
@@ -204,7 +202,6 @@ class AuthenticationActivity : BaseActivity1<AuthModel, ActivityAuthenticationBi
             override fun onStateChanged(id: Int, state: TransferState) {
                 if (state.toString() === "COMPLETED") {
                     val imageUrl = "${awsbean?.ql04hxK6f7XCrL47zFHGrHl7STBwm98}/$key"
-                    Log.i("S3", "上传完成" + imageUrl)
                     dismissLoadingExt()
                     if (param1 == 1) {
                         val message = Message()
@@ -226,7 +223,6 @@ class AuthenticationActivity : BaseActivity1<AuthModel, ActivityAuthenticationBi
             }
 
             override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-                Log.i("S3", "上传进度：$bytesCurrent/$bytesTotal")
             }
 
             override fun onError(id: Int, e: Exception) {
